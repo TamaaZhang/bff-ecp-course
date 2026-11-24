@@ -3,116 +3,150 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>階段二：建立 ECP 單元</title>
 <style>
+/* 版面與配色參考 Google Codelabs。 */
 :root {
-  --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
-  --accent: #1a73e8; --accent-soft: #e8f0fe; --done: #188038;
-  --note-bg: #fef7e0; --note-line: #f9ab00; --warn-bg: #fce8e6; --warn-line: #d93025;
-  --code-bg: #eef1f4;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #16181c; --panel: #1f2227; --text: #e6e8eb; --muted: #a0a8b2; --line: #363b42;
-    --accent: #8ab4f8; --accent-soft: #23324a; --done: #81c995;
-    --note-bg: #3a3220; --note-line: #f9ab00; --warn-bg: #3d2523; --warn-line: #f28b82;
-    --code-bg: #2a2e35;
-  }
+  --page: #e8eaed; --drawer: #f8f9fa; --card: #ffffff; --text: #4e5256; --strong: #202124; --muted: #5f6368;
+  --line: #dadce0; --blue: #1a73e8; --blue-soft: #e8f0fe; --grey: #80868b; --green: #0f9d58;
+  --note-bg: #e6f4ea; --note-line: #137333; --warn-bg: #fce8e6; --warn-line: #c5221f;
+  --code-bg: #f1f3f4; --code-text: #37474f; --inline-code: #e8eaed;
+  --shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+  --btn-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12), 0 3px 1px -2px rgba(0, 0, 0, .2);
+  --sans: "Google Sans", Roboto, "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  --mono: "Roboto Mono", Consolas, "SF Mono", Menlo, monospace;
+  --top: 64px; --drawer-w: 256px;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; }
-body { background: var(--bg); color: var(--text); font: 16px/1.7 system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif; }
-.layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
-nav { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-nav .title { padding: 0 20px 4px; font-weight: 700; font-size: 17px; }
-nav .home { display: block; padding: 0 20px 12px; color: var(--accent); font-size: 14px; text-decoration: none; }
-nav .home[hidden] { display: none; }
-nav .total { padding: 0 20px 16px; color: var(--muted); font-size: 14px; }
-nav ol { list-style: none; margin: 0; padding: 0; }
-nav button { all: unset; box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 20px; cursor: pointer; color: var(--text); font-size: 15px; line-height: 1.5; }
-nav button:hover { background: var(--accent-soft); }
-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-nav button[aria-current="step"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
-nav .num { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: grid; place-items: center; font-size: 13px; }
-nav button[aria-current="step"] .num { border-color: var(--accent); background: var(--accent); color: var(--bg); }
-nav .seen .num { border-color: var(--done); color: var(--done); }
-main { padding: 32px 48px 48px; max-width: 1000px; width: 100%; margin: 0 auto; }
-.mobile-bar { display: none; }
-section[data-step] { display: none; }
-section[data-step].active { display: block; }
-h1 { font-size: 26px; margin: 0 0 4px; }
-.meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-h2 { font-size: 18px; margin: 28px 0 8px; }
-ol.steps > li { margin-bottom: 14px; }
-table { border-collapse: collapse; margin: 10px 0 16px; font-size: 15px; display: block; overflow-x: auto; max-width: 100%; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--page); color: var(--text); font: 14px/24px var(--sans); overflow: hidden; }
+a { color: var(--blue); font-weight: 500; text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+svg { display: block; fill: currentColor; }
+
+/* 頂部列 */
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--top); z-index: 20; display: flex; align-items: center; gap: 8px; padding: 0 24px 0 12px; background: var(--card); box-shadow: var(--shadow); color: #3c4043; }
+.icon-btn { all: unset; box-sizing: border-box; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: #5f6368; }
+.icon-btn:hover { background: var(--page); text-decoration: none; }
+.icon-btn:focus-visible { outline: 2px solid var(--blue); }
+.icon-btn[hidden] { display: none; }
+#menu-toggle { display: none; }
+.lab-title { flex: 1; min-width: 0; margin: 0 0 0 4px; font-size: 20px; font-weight: 400; color: #3c4043; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.remaining { display: flex; align-items: center; gap: 6px; flex: none; font-size: 14px; color: #3c4043; }
+
+/* 左側步驟列表 */
+.drawer { position: fixed; top: var(--top); left: 0; bottom: 0; width: var(--drawer-w); z-index: 10; overflow-y: auto; background: var(--drawer); padding: 6px 12px 24px; }
+.drawer ol { list-style: none; margin: 0; padding: 0; }
+.drawer button { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 55px; margin: 6px 0; padding: 3px 10px; cursor: pointer; background: var(--card); border: 1px solid var(--line); border-radius: 5px; color: var(--muted); font: 14px/20px var(--sans); transition: box-shadow .2s; }
+.drawer button:hover { box-shadow: var(--shadow); }
+.drawer button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.drawer button.reached { color: #212121; }
+.drawer button[aria-current="step"] { border-color: var(--card); box-shadow: var(--shadow); font-weight: 600; color: #212121; }
+.drawer .num { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--grey); color: #fff; font-size: 14px; font-weight: 400; }
+.drawer .reached .num { background: var(--blue); }
+.drawer .total { margin: 12px 4px 0; color: var(--muted); font-size: 13px; }
+
+/* 內容：每一步是一張卡片，切換時左右滑動 */
+.viewport { position: fixed; top: var(--top); left: var(--drawer-w); right: 0; bottom: 0; overflow: hidden; }
+section[data-step] { position: absolute; inset: 0; overflow-y: auto; padding: 32px 24px 112px; outline: none; }
+section[data-step][hidden] { display: none; }
+.card { max-width: 800px; margin: 0 auto; background: var(--card); border-radius: 4px; box-shadow: var(--shadow); padding: 24px 24px 32px; }
+.card h1 { margin: 0 0 30px; font-size: 28px; line-height: 1.3; font-weight: 400; color: var(--text); }
+.card h2 { margin: 28px 0 8px; font-size: 18px; font-weight: 500; color: var(--text); }
+.card h3 { margin: 22px 0 6px; font-size: 16px; font-weight: 500; color: var(--text); }
+.card .meta { display: none; }
+.card p, .card ul, .card ol { margin: 0 0 14px; }
+.card li { margin-bottom: 6px; }
+ol.steps > li { margin-bottom: 12px; }
+.path { font-weight: 600; color: var(--strong); }
+strong { color: var(--strong); font-weight: 600; }
+
+table { border-collapse: collapse; margin: 10px 0 16px; display: block; overflow-x: auto; max-width: 100%; }
 th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
-th { background: var(--panel); white-space: nowrap; }
-code { font-family: Consolas, "SF Mono", Menlo, monospace; background: var(--code-bg); border-radius: 4px; padding: 1px 6px; font-size: 14px; }
-.cp { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-.cp button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; line-height: 20px; }
-.cp button:hover { background: var(--accent-soft); }
-.cp button:focus-visible { outline: 2px solid var(--accent); }
-.path { font-weight: 600; }
-/* 欄位設定表：格子不換行，太寬就在表格內左右捲動，避免一個字一行。 */
+th { background: var(--code-bg); color: var(--strong); font-weight: 500; white-space: nowrap; }
+/* 欄位設定表：格子不換行，太寬就在表格內左右捲動。 */
 table.fields th, table.fields td { white-space: nowrap; }
-.cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
-.cp.block code { padding: 0; background: none; word-break: break-all; }
-.cp.block button { flex: none; }
-.cp.block.pre code { display: block; flex: 1; min-width: 0; white-space: pre; word-break: normal; overflow: auto; max-height: 360px; }
-details { border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; margin: 10px 0; }
-details > summary { cursor: pointer; font-weight: 600; color: var(--accent); }
-details[open] > summary { margin-bottom: 8px; }
-summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.optional { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 10px; padding: 0 8px; vertical-align: middle; }
-a { color: var(--accent); }
-a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
-a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.note, .warn { border-left: 4px solid; border-radius: 4px; padding: 10px 14px; margin: 14px 0; }
+
+/* 行內程式碼 */
+code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--code-text); background: var(--inline-code); border-radius: 4px; padding: 1px 4px; }
+.cp { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.copy-btn { all: unset; box-sizing: border-box; display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; color: #5f6368; }
+.copy-btn:hover { background: var(--page); color: var(--strong); }
+.copy-btn:focus-visible { outline: 2px solid var(--blue); }
+.copy-btn.done { color: var(--green); }
+
+/* 程式碼區塊：灰底、右上角複製圖示 */
+.cp.block { position: relative; display: block; white-space: normal; margin: 16px 0; background: var(--code-bg); }
+.cp.block code { display: block; padding: 8px 48px 8px 8px; background: none; border-radius: 0; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--code-text); white-space: pre-wrap; word-break: break-all; }
+.cp.block.pre code { white-space: pre; word-break: normal; overflow: auto; max-height: 420px; }
+.cp.block .copy-btn { position: absolute; top: 4px; right: 8px; width: 32px; height: 32px; background: var(--code-bg); }
+.cp.block .copy-btn:hover { background: var(--line); }
+
+/* 提示框 */
+.note, .warn { border: 1px solid; border-left-width: 4px; border-radius: 4px; padding: 15px 20px; margin: 16px 0; color: #212124; }
 .note { background: var(--note-bg); border-color: var(--note-line); }
 .warn { background: var(--warn-bg); border-color: var(--warn-line); }
 .note > :first-child, .warn > :first-child { margin-top: 0; }
 .note > :last-child, .warn > :last-child { margin-bottom: 0; }
-.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
-.pager button { font: inherit; padding: 8px 20px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-.pager button.next { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; margin-left: auto; }
-.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.pager button[hidden] { display: none; }
-@media (min-width: 1600px) {
-  body { font-size: 17px; }
-  .layout { grid-template-columns: 320px 1fr; }
-  main { max-width: 1100px; }
+
+details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
+details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
+details[open] > summary { margin-bottom: 4px; }
+.optional { display: inline-block; font-size: 12px; line-height: 20px; font-weight: 500; color: var(--blue); background: var(--blue-soft); border-radius: 10px; padding: 0 8px; vertical-align: middle; }
+a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 24px; border-radius: 4px; background: var(--blue); color: #fff; font-weight: 600; box-shadow: var(--btn-shadow); }
+a.btn:hover { text-decoration: none; }
+
+/* 固定在底部的上一步、下一步 */
+.fabs { position: fixed; left: var(--drawer-w); right: 0; bottom: 32px; z-index: 5; display: flex; padding: 0 80px; pointer-events: none; }
+.fab { all: unset; pointer-events: auto; box-sizing: border-box; display: inline-block; padding: 6px 24px; border-radius: 4px; cursor: pointer; font: 600 14px/24px var(--sans); box-shadow: var(--btn-shadow); }
+.fab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.fab.prev { background: var(--card); color: var(--blue); }
+.fab.next, .fab.done { background: var(--blue); color: #fff; margin-left: auto; }
+.fab.done { background: var(--green); }
+.fab.done:hover { text-decoration: none; }
+.fab[hidden] { display: none; }
+
+.scrim { display: none; }
+@media (max-width: 840px) {
+  #menu-toggle { display: grid; }
+  .topbar { padding-right: 12px; }
+  .drawer { width: 280px; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; box-shadow: var(--shadow); z-index: 30; }
+  .drawer.open { transform: none; visibility: visible; }
+  .scrim.open { display: block; position: fixed; inset: var(--top) 0 0 0; z-index: 25; background: rgba(32, 33, 36, .4); }
+  .viewport, .fabs { left: 0; }
+  section[data-step] { padding: 0 0 88px; }
+  .card { border-radius: 0; box-shadow: none; padding: 20px 16px 24px; }
+  .card h1 { font-size: 24px; margin-bottom: 20px; }
+  .fabs { padding: 0 16px; bottom: 16px; }
+  .remaining .label { display: none; }
 }
-@media (max-width: 1200px) {
-  .layout { grid-template-columns: 240px 1fr; }
-  main { padding: 28px 28px 40px; }
-  nav button { padding: 8px 14px; }
-  nav .title, nav .total, nav .home { padding-left: 14px; padding-right: 14px; }
-}
-@media (max-width: 800px) {
-  .layout { display: block; }
-  nav { display: none; position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-  nav.open { display: block; }
-  .mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 1; background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 16px; }
-  .mobile-bar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mobile-bar button { flex: none; font: inherit; font-size: 14px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); }
-  main { padding: 20px 16px 32px; }
-  h1 { font-size: 22px; }
+@media (prefers-reduced-motion: reduce) {
+  .drawer { transition: none; }
 }
 </style>
 </head>
 <body>
-<div class="mobile-bar">
-  <span id="mobile-label"></span>
-  <button type="button" id="menu-toggle" aria-expanded="false" aria-controls="toc">所有步驟</button>
-</div>
-<div class="layout">
-  <nav id="toc" aria-label="步驟">
-    <a class="home" id="home" href="./" hidden>← 課程首頁</a>
-    <div class="title">階段二：建立 ECP 單元</div>
-    <div class="total" id="total"></div>
-    <ol id="toc-list"></ol>
-  </nav>
-  <main>
+<header class="topbar">
+  <button type="button" class="icon-btn" id="menu-toggle" aria-label="所有步驟" aria-expanded="false" aria-controls="toc">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+  </button>
+  <a class="icon-btn" id="home" href="./" aria-label="回課程首頁" title="回課程首頁" hidden>
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </a>
+  <h1 class="lab-title">階段二：建立 ECP 單元</h1>
+  <div class="remaining">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+    <span id="remaining"></span>
+  </div>
+</header>
+<nav class="drawer" id="toc" aria-label="步驟">
+  <ol id="toc-list"></ol>
+  <div class="total" id="total"></div>
+</nav>
+<div class="scrim" id="scrim"></div>
+<main class="viewport">
 
 <section data-step data-min="2" data-title="概覽">
   <h1>概覽</h1>
@@ -273,11 +307,12 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </table>
 </section>
 
-    <div class="pager">
-      <button type="button" id="prev">← 上一步</button>
-      <button type="button" class="next" id="next">下一步 →</button>
-    </div>
-  </main>
+
+</main>
+<div class="fabs">
+  <button type="button" class="fab prev" id="prev">上一步</button>
+  <button type="button" class="fab next" id="next">下一步</button>
+  <a class="fab done" id="done" href="./" hidden>完成</a>
 </div>
 
 <script>
@@ -285,22 +320,37 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   const sections = Array.from(document.querySelectorAll('section[data-step]'));
   const list = document.getElementById('toc-list');
   const nav = document.getElementById('toc');
+  const scrim = document.getElementById('scrim');
   const toggle = document.getElementById('menu-toggle');
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
-  const mobileLabel = document.getElementById('mobile-label');
-  const seen = new Set();
-  // 放在教學網站上才有首頁；學員直接打開檔案時不顯示這個連結。
-  if (location.protocol === 'https:' || location.protocol === 'http:') document.getElementById('home').hidden = false;
+  const done = document.getElementById('done');
+  const remaining = document.getElementById('remaining');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const minutes = function (s) { return s.hasAttribute('data-optional') ? 0 : Number(s.dataset.min) || 0; };
+  let current = -1;
+  let finishSlide = null;
+
+  // 放在教學網站上才有首頁；學員直接打開檔案時不顯示首頁連結，「完成」也不顯示。
+  const onSite = location.protocol === 'https:' || location.protocol === 'http:';
+  document.getElementById('home').hidden = !onSite;
 
   // 選做的自我練習（data-optional）不算進總時間。
-  const total = sections.reduce(function (sum, s) { return s.hasAttribute('data-optional') ? sum : sum + Number(s.dataset.min); }, 0);
+  const total = sections.reduce(function (sum, s) { return sum + minutes(s); }, 0);
   const hasOptional = sections.some(function (s) { return s.hasAttribute('data-optional'); });
   document.getElementById('total').textContent = '預計 ' + total + ' 分鐘' + (hasOptional ? '（不含自我練習）' : '');
 
   const buttons = sections.map(function (s, i) {
-    const min = Number(s.dataset.min);
-    s.querySelector('.meta').textContent = '步驟 ' + (i + 1) + ' / ' + sections.length + (min ? '　·　約 ' + min + ' 分鐘' : '');
+    // 每一步的內容包成一張卡片，標題前面加上步驟編號。
+    const card = document.createElement('div');
+    card.className = 'card';
+    while (s.firstChild) card.append(s.firstChild);
+    s.append(card);
+    s.tabIndex = -1;
+    s.hidden = true;
+    const h1 = card.querySelector('h1');
+    if (h1) h1.prepend((i + 1) + '. ');
+
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
@@ -310,15 +360,24 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     const label = document.createElement('span');
     label.textContent = s.dataset.title;
     b.append(num, label);
-    b.addEventListener('click', function () { go(i); nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); });
+    b.addEventListener('click', function () { go(i); setMenu(false); });
     li.append(b);
     list.append(li);
     return b;
   });
 
+  function setMenu(open) {
+    nav.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+  toggle.addEventListener('click', function () { setMenu(!nav.classList.contains('open')); });
+  scrim.addEventListener('click', function () { setMenu(false); });
+
   // 換頁並把步驟寫進網址（#3），重新整理或分享連結時會停在同一步。
   function go(i) {
-    show(i);
+    if (i < 0 || i >= sections.length || i === current) return;
+    show(i, true);
     try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* 有些預覽環境不能改網址，不影響換頁 */ }
   }
 
@@ -327,28 +386,69 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     return i >= 0 && i < sections.length ? i : 0;
   }
 
-  function show(i) {
-    seen.add(i);
-    sections.forEach(function (s, j) { s.classList.toggle('active', j === i); });
+  function show(i, animate) {
+    if (finishSlide) finishSlide();
+    const from = sections[current];
+    const to = sections[i];
+    const dir = i > current ? 1 : -1;
+    to.hidden = false;
+    to.scrollTop = 0;
+    if (from && animate && !reduceMotion.matches) {
+      // 新的一步從旁邊滑進來，舊的一步滑出去（和 Google Codelabs 一樣）。
+      const ease = 'transform .5s cubic-bezier(.4, 0, .2, 1)';
+      to.style.transition = 'none';
+      to.style.transform = 'translate3d(' + (110 * dir) + '%, 0, 0)';
+      void to.offsetWidth;
+      to.style.transition = ease;
+      from.style.transition = ease;
+      to.style.transform = 'translate3d(0, 0, 0)';
+      from.style.transform = 'translate3d(' + (-110 * dir) + '%, 0, 0)';
+      const timer = setTimeout(function () { if (finishSlide) finishSlide(); }, 550);
+      finishSlide = function () {
+        clearTimeout(timer);
+        from.hidden = true;
+        from.style.transition = from.style.transform = '';
+        to.style.transition = to.style.transform = '';
+        finishSlide = null;
+      };
+    } else if (from) {
+      from.hidden = true;
+    }
+    current = i;
+    to.focus({ preventScroll: true });
+
+    let left = 0;
+    sections.forEach(function (s, j) { if (j >= i) left += minutes(s); });
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = '還剩 ';
+    remaining.replaceChildren(label, left + ' 分鐘');
+
     buttons.forEach(function (b, j) {
       if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
-      b.classList.toggle('seen', seen.has(j) && j !== i);
+      b.classList.toggle('reached', j <= i);
     });
+    buttons[i].scrollIntoView({ block: 'nearest' });
+    const last = i === sections.length - 1;
     prev.hidden = i === 0;
-    next.hidden = i === sections.length - 1;
-    mobileLabel.textContent = (i + 1) + ' / ' + sections.length + '　' + sections[i].dataset.title;
-    document.title = sections[i].dataset.title + '｜階段二：建立 ECP 單元';
-    window.scrollTo(0, 0);
+    next.hidden = last;
+    done.hidden = !last || !onSite;
+    document.title = (i + 1) + '. ' + to.dataset.title + '｜階段二：建立 ECP 單元';
   }
 
-  prev.addEventListener('click', function () { go(Math.max(0, current() - 1)); });
-  next.addEventListener('click', function () { go(Math.min(sections.length - 1, current() + 1)); });
-  function current() { return sections.findIndex(function (s) { return s.classList.contains('active'); }); }
-  toggle.addEventListener('click', function () {
-    const open = nav.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
+  prev.addEventListener('click', function () { go(current - 1); });
+  next.addEventListener('click', function () { go(current + 1); });
+  window.addEventListener('hashchange', function () { go(fromHash()); });
+
+  // 鍵盤左右方向鍵換頁；焦點在輸入框或程式碼區塊（要左右捲動）時不換頁。
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const t = e.target;
+    if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Escape') setMenu(false);
   });
-  window.addEventListener('hashchange', function () { show(fromHash()); });
 
   // 複製按鈕：學員照抄的值一律用複製，避免打錯字。
   function copyText(text) {
@@ -363,20 +463,28 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     ta.remove();
     return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
   }
+  const copyIcon = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+  const doneIcon = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
   document.querySelectorAll('.cp').forEach(function (wrap) {
     const text = wrap.querySelector('code').textContent;
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = '複製';
-    b.setAttribute('aria-label', '複製 ' + text);
+    b.className = 'copy-btn';
+    b.innerHTML = copyIcon;
+    b.title = '複製';
+    b.setAttribute('aria-label', wrap.classList.contains('block') ? '複製程式碼' : '複製 ' + text);
     b.addEventListener('click', function () {
-      copyText(text).then(function () { b.textContent = '已複製 ✓'; }, function () { b.textContent = '請手動選取'; });
-      setTimeout(function () { b.textContent = '複製'; }, 1500);
+      copyText(text).then(function () {
+        b.innerHTML = doneIcon;
+        b.classList.add('done');
+        b.title = '已複製';
+      }, function () { b.title = '請手動選取'; });
+      setTimeout(function () { b.innerHTML = copyIcon; b.classList.remove('done'); b.title = '複製'; }, 1500);
     });
     wrap.append(b);
   });
 
-  show(fromHash());
+  show(fromHash(), false);
 })();
 </script>
 </body>
