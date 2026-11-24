@@ -69,7 +69,7 @@ table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
 th { background: var(--code-bg); color: var(--strong); font-weight: 500; white-space: nowrap; }
 /* 欄位設定表：格子不換行，太寬就在表格內左右捲動。 */
-table.fields th, table.fields td { white-space: nowrap; }
+table.fields th, table.fields td, th.nw, td.nw { white-space: nowrap; }
 
 /* 行內程式碼 */
 code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--code-text); background: var(--inline-code); border-radius: 4px; padding: 1px 4px; }
@@ -109,6 +109,18 @@ a.btn:hover { text-decoration: none; }
 .fab.done { background: var(--green); }
 .fab.done:hover { text-decoration: none; }
 .fab[hidden] { display: none; }
+
+/* 大螢幕：卡片跟著變寬，字也大一點，不要只佔中間一小塊。 */
+@media (min-width: 1400px) {
+  :root { --drawer-w: 288px; }
+  body { font-size: 15px; line-height: 26px; }
+  .card { max-width: 1000px; padding: 32px 40px 40px; }
+}
+@media (min-width: 1800px) {
+  body { font-size: 16px; line-height: 28px; }
+  .card { max-width: 1160px; }
+  .drawer button { font-size: 15px; }
+}
 
 .scrim { display: none; }
 @media (max-width: 840px) {
@@ -155,10 +167,10 @@ a.btn:hover { text-decoration: none; }
   <div class="meta"></div>
   <p>這個階段用 Google 試算表當資料來源，做出一個會議室預約看板。</p>
   <table>
-    <tr><th>段落</th><th>做什麼</th><th>誰動手</th></tr>
+    <tr><th>段落</th><th>做什麼</th><th class="nw">誰動手</th></tr>
     <tr><td>準備 A～D</td><td>複製試算表範本、產生通行碼、部署 Apps Script、填 <code>bff/.env</code></td><td>你</td></tr>
-    <tr><td>第一步：查詢</td><td>選日期、看那天的預約</td><td>AI 寫程式，你驗收</td></tr>
-    <tr><td>第二步：新增、修改、刪除</td><td>在看板上新增、修改、刪除預約</td><td>AI 寫程式，你驗收</td></tr>
+    <tr><td>第一步：查詢</td><td>選日期、看那天的預約</td><td class="nw">AI 寫程式，你驗收</td></tr>
+    <tr><td>第二步：新增、修改、刪除</td><td>在看板上新增、修改、刪除預約</td><td class="nw">AI 寫程式，你驗收</td></tr>
     <tr><td>自我練習 <span class="optional">選做</span></td><td>自己建試算表；不用指令，自己請 AI 做 BFF</td><td>你</td></tr>
   </table>
   <p>查詢和新增修改刪除分兩步做：先把查詢做好、驗收通過，再加上新增、修改、刪除。程式一次只多一點，比較看得懂，出錯也比較好找。</p>

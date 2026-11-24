@@ -69,7 +69,7 @@ table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
 th { background: var(--code-bg); color: var(--strong); font-weight: 500; white-space: nowrap; }
 /* 欄位設定表：格子不換行，太寬就在表格內左右捲動。 */
-table.fields th, table.fields td { white-space: nowrap; }
+table.fields th, table.fields td, th.nw, td.nw { white-space: nowrap; }
 
 /* 行內程式碼 */
 code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--code-text); background: var(--inline-code); border-radius: 4px; padding: 1px 4px; }
@@ -109,6 +109,18 @@ a.btn:hover { text-decoration: none; }
 .fab.done { background: var(--green); }
 .fab.done:hover { text-decoration: none; }
 .fab[hidden] { display: none; }
+
+/* 大螢幕：卡片跟著變寬，字也大一點，不要只佔中間一小塊。 */
+@media (min-width: 1400px) {
+  :root { --drawer-w: 288px; }
+  body { font-size: 15px; line-height: 26px; }
+  .card { max-width: 1000px; padding: 32px 40px 40px; }
+}
+@media (min-width: 1800px) {
+  body { font-size: 16px; line-height: 28px; }
+  .card { max-width: 1160px; }
+  .drawer button { font-size: 15px; }
+}
 
 .scrim { display: none; }
 @media (max-width: 840px) {
