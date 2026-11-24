@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>建立 Google Sheet 資料來源</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
+  --accent: #1a73e8; --accent-soft: #e8f0fe; --done: #188038;
+  --note-bg: #fef7e0; --note-line: #f9ab00; --warn-bg: #fce8e6; --warn-line: #d93025;
+  --code-bg: #eef1f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16181c; --panel: #1f2227; --text: #e6e8eb; --muted: #a0a8b2; --line: #363b42;
+    --accent: #8ab4f8; --accent-soft: #23324a; --done: #81c995;
+    --note-bg: #3a3220; --note-line: #f9ab00; --warn-bg: #3d2523; --warn-line: #f28b82;
+    --code-bg: #2a2e35;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 16px/1.7 system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif; }
+.layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+nav { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .title { padding: 0 20px 4px; font-weight: 700; font-size: 17px; }
+nav .home { display: block; padding: 0 20px 12px; color: var(--accent); font-size: 14px; text-decoration: none; }
+nav .home[hidden] { display: none; }
+nav .total { padding: 0 20px 16px; color: var(--muted); font-size: 14px; }
+nav ol { list-style: none; margin: 0; padding: 0; }
+nav button { all: unset; box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 20px; cursor: pointer; color: var(--text); font-size: 15px; line-height: 1.5; }
+nav button:hover { background: var(--accent-soft); }
+nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+nav button[aria-current="step"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+nav .num { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: grid; place-items: center; font-size: 13px; }
+nav button[aria-current="step"] .num { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+nav .seen .num { border-color: var(--done); color: var(--done); }
+main { padding: 32px 48px 48px; max-width: 900px; width: 100%; }
+.mobile-bar { display: none; }
+section[data-step] { display: none; }
+section[data-step].active { display: block; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+.meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+h2 { font-size: 18px; margin: 28px 0 8px; }
+ol.steps > li { margin-bottom: 14px; }
+table { border-collapse: collapse; margin: 10px 0 16px; font-size: 15px; display: block; overflow-x: auto; max-width: 100%; }
+th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
+th { background: var(--panel); white-space: nowrap; }
+code { font-family: Consolas, "SF Mono", Menlo, monospace; background: var(--code-bg); border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+.cp { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.cp button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; line-height: 20px; }
+.cp button:hover { background: var(--accent-soft); }
+.cp button:focus-visible { outline: 2px solid var(--accent); }
+.path { font-weight: 600; }
+.cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+.cp.block code { padding: 0; background: none; word-break: break-all; }
+.cp.block button { flex: none; }
+a { color: var(--accent); }
+a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
+a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note, .warn { border-left: 4px solid; border-radius: 4px; padding: 10px 14px; margin: 14px 0; }
+.note { background: var(--note-bg); border-color: var(--note-line); }
+.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.note > :first-child, .warn > :first-child { margin-top: 0; }
+.note > :last-child, .warn > :last-child { margin-bottom: 0; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+.pager button { font: inherit; padding: 8px 20px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.pager button.next { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; margin-left: auto; }
+.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pager button[hidden] { display: none; }
+@media (max-width: 800px) {
+  .layout { display: block; }
+  nav { display: none; position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  nav.open { display: block; }
+  .mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 1; background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+  .mobile-bar button { font: inherit; font-size: 14px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); }
+  main { padding: 20px 16px 32px; }
+  h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-bar">
+  <span id="mobile-label"></span>
+  <button type="button" id="menu-toggle" aria-expanded="false" aria-controls="toc">所有步驟</button>
+</div>
+<div class="layout">
+  <nav id="toc" aria-label="步驟">
+    <a class="home" id="home" href="./" hidden>← 課程首頁</a>
+    <div class="title">階段一準備：建立 Google Sheet 資料來源</div>
+    <div class="total" id="total"></div>
+    <ol id="toc-list"></ol>
+  </nav>
+  <main>
+
+<section data-step data-min="1" data-title="概覽">
+  <h1>概覽</h1>
+  <div class="meta"></div>
+  <p>做完這份說明，你會有：</p>
+  <ul>
+    <li>一份放會議室與預約資料的 Google 試算表</li>
+    <li>一個給 BFF 呼叫的 Apps Script API（整門課只要部署這一次）</li>
+    <li>填好的 <code>bff/.env</code></li>
+  </ul>
+  <h2>需要</h2>
+  <ul>
+    <li>一個 Google 帳號（個人 Gmail 最保險；公司或學校帳號可能被管理者關掉 Apps Script）</li>
+    <li>已安裝 Node.js 22.9 以上（產生通行碼會用到）</li>
+    <li>學員起始包（裡面有 <code>bff/.env.example</code>）</li>
+  </ul>
+</section>
+
+<section data-step data-min="5" data-title="A. 建立試算表">
+  <h1>A. 建立試算表</h1>
+  <div class="meta"></div>
+  <h2>方法 1（建議）：用講師的範本</h2>
+  <ol class="steps">
+    <li><a class="btn" href="https://docs.google.com/spreadsheets/d/1ewnKDc1AFazWhxQmTBU1NnVbiKHdaSWXEShDLY1Dj2U/copy" target="_blank" rel="noopener">打開範本並建立副本 ↗</a><br>
+      按「建立副本」。範本已經含有資料和 Apps Script，副本會放在你自己的雲端硬碟。</li>
+    <li>接著做這一頁最下方的「兩種方法都要確認」，然後<strong>跳過 B</strong>，直接到 <strong>C. 產生通行碼</strong>。</li>
+  </ol>
+  <h2>方法 2：自己建</h2>
+  <ol class="steps">
+    <li>打開 <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a> 建立空白試算表，命名為「會議室預約」。</li>
+    <li><span class="path">檔案 → 匯入 → 上傳</span>，選起始包 <code>sheet/</code> 資料夾裡的 <code>會議室.csv</code>，匯入位置選<strong>「插入新工作表」</strong>。</li>
+    <li>同樣方法匯入 <code>預約.csv</code>。</li>
+    <li>刪掉原本空白的「工作表1」。確認下方的工作表名稱剛好是 <span class="cp"><code>會議室</code></span> 和 <span class="cp"><code>預約</code></span>（一個字都不能差）。</li>
+  </ol>
+  <h2>兩種方法都要確認</h2>
+  <ul>
+    <li><span class="path">檔案 → 設定 → 時區</span> 是 <strong>(GMT+08:00) 台北</strong>。</li>
+    <li>「預約」的開始、結束時間顯示成日期時間（例如 <code>2026/11/24 9:00:00</code>）。如果顯示成小數，選取那兩欄，<span class="path">格式 → 數值 → 日期時間</span>。</li>
+  </ul>
+  <div class="note"><p>範例預約用了 <code>=TODAY()</code> 公式，所以每天打開都會是「今天」和「明天」的預約，方便練習。</p></div>
+</section>
+
+<section data-step data-min="2" data-title="B. 貼上 Apps Script">
+  <h1>B. 貼上 Apps Script</h1>
+  <div class="meta"></div>
+  <div class="note"><p>用<strong>方法 1（範本）</strong>的人跳過這一步：範本已經有 Apps Script 了。</p></div>
+  <ol class="steps">
+    <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。</li>
+    <li>刪掉編輯器裡原本的內容，把起始包的 <code>sheet/Code.gs</code> 整份貼上，按儲存（磁碟片圖示）。</li>
+  </ol>
+</section>
+
+<section data-step data-min="3" data-title="C. 產生通行碼">
+  <h1>C. 產生通行碼</h1>
+  <div class="meta"></div>
+  <p>通行碼是 BFF 和 Apps Script 之間的「暗號」：BFF 呼叫時要帶上，Apps Script 對了才回資料。</p>
+  <ol class="steps">
+    <li>在<strong>你自己的終端機</strong>（Windows：PowerShell；Mac：終端機）執行下面這行，會印出一長串亂數，這就是你的通行碼：
+      <div class="cp block"><code>node -e "console.log(crypto.randomUUID() + crypto.randomUUID())"</code></div>
+      <div class="warn"><p>不要請 AI 幫你執行這行：AI 執行的指令，輸出會留在對話紀錄裡。</p></div>
+    </li>
+    <li>在 Apps Script 左側按「專案設定」（齒輪）→ 最下方「指令碼屬性」→「新增指令碼屬性」：
+      <table>
+        <tr><th>屬性</th><td><span class="cp"><code>BFF_TOKEN</code></span></td></tr>
+        <tr><th>值</th><td>剛剛那串通行碼</td></tr>
+      </table>
+      按「儲存指令碼屬性」。</li>
+  </ol>
+</section>
+
+<section data-step data-min="5" data-title="D. 部署成網頁 API">
+  <h1>D. 部署成網頁 API</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>Apps Script 右上角 <span class="path">部署 → 新增部署作業</span>。</li>
+    <li>左邊齒輪選「網頁應用程式」。</li>
+    <li>執行身分：<strong>我</strong>；誰可以存取：<strong>所有人</strong>。</li>
+    <li>按「部署」。第一次會要求授權：選你的帳號 → 看到「Google 尚未驗證這個應用程式」時按「進階」→「前往（不安全）」→「允許」。<br>
+      這是因為這支程式是你自己的，還沒送 Google 審核；它只會讀寫你這份試算表的「會議室」「預約」兩張工作表。</li>
+    <li>複製「網頁應用程式」網址（結尾是 <code>/exec</code>）。</li>
+  </ol>
+  <div class="note"><p>「所有人」的意思是：知道網址的人都能呼叫。所以才需要通行碼：沒有通行碼的呼叫，只會得到 <code>unauthorized</code>。</p></div>
+</section>
+
+<section data-step data-min="3" data-title="E. 填寫 bff/.env">
+  <h1>E. 填寫 <code>bff/.env</code></h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>把 <code>bff/.env.example</code> 複製一份，改名為 <code>bff/.env</code>（同一個資料夾）。</li>
+    <li>填入（等號後面直接接值，不用加引號）：
+      <table>
+        <tr><th>這一行</th><th>填什麼</th></tr>
+        <tr><td><span class="cp"><code>SHEET_API_URL=</code></span></td><td>剛剛的 <code>/exec</code> 網址</td></tr>
+        <tr><td><span class="cp"><code>SHEET_API_TOKEN=</code></span></td><td>你的通行碼</td></tr>
+      </table>
+    </li>
+    <li>存檔。</li>
+  </ol>
+  <h2>哪些可以告訴 AI</h2>
+  <table>
+    <tr><th>項目</th><th>可以告訴 AI 嗎</th></tr>
+    <tr><td>網頁應用程式網址</td><td>可以（沒有通行碼也讀不到資料）</td></tr>
+    <tr><td>工作表名稱、欄位名稱</td><td>可以</td></tr>
+    <tr><td>通行碼</td><td><strong>不可以</strong>，只寫在 <code>bff/.env</code></td></tr>
+  </table>
+  <h2>做完了</h2>
+  <p>在起始包資料夾用 Claude Code 輸入 <code>/bff-step1-sheet-query</code>（Codex：貼上 <code>提示詞/STEP1_查詢.md</code>），開始階段一。</p>
+</section>
+
+<section data-step data-min="0" data-title="之後改了 Code.gs 怎麼辦">
+  <h1>之後改了 Code.gs 怎麼辦</h1>
+  <div class="meta"></div>
+  <p>改完儲存後，要 <span class="path">部署 → 管理部署作業 → 編輯（鉛筆）→ 版本：新版本 → 部署</span>。</p>
+  <p>不這樣做的話，網址背後跑的還是舊版程式。網址不會變，<code>.env</code> 不用改。</p>
+</section>
+
+<section data-step data-min="0" data-title="常見問題">
+  <h1>常見問題</h1>
+  <div class="meta"></div>
+  <table>
+    <tr><th>看到</th><th>原因</th></tr>
+    <tr><td><code>DATA-503</code>、<code>source_auth_failed</code></td><td><code>.env</code> 的通行碼和指令碼屬性不一樣；或「誰可以存取」不是「所有人」</td></tr>
+    <tr><td><code>DATA-503</code>、<code>source_unavailable</code></td><td>網址貼錯、網路不通，或 Google 暫時沒回應（稍等再試）</td></tr>
+    <tr><td><code>DATA-502</code>、<code>source_bad_response</code></td><td>工作表名稱或第一列欄位名稱和範例不同；或改了 Code.gs 沒部署新版本</td></tr>
+    <tr><td>查得到會議室，預約卻是空的</td><td>試算表時區不是台北，或時間欄是文字不是日期時間</td></tr>
+  </table>
+</section>
+
+    <div class="pager">
+      <button type="button" id="prev">← 上一步</button>
+      <button type="button" class="next" id="next">下一步 →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const sections = Array.from(document.querySelectorAll('section[data-step]'));
+  const list = document.getElementById('toc-list');
+  const nav = document.getElementById('toc');
+  const toggle = document.getElementById('menu-toggle');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const mobileLabel = document.getElementById('mobile-label');
+  const seen = new Set();
+  // 放在教學網站上才有首頁；學員直接打開檔案時不顯示這個連結。
+  if (location.protocol === 'https:' || location.protocol === 'http:') document.getElementById('home').hidden = false;
+
+  const total = sections.reduce(function (sum, s) { return sum + Number(s.dataset.min); }, 0);
+  document.getElementById('total').textContent = '預計 ' + total + ' 分鐘';
+
+  const buttons = sections.map(function (s, i) {
+    const min = Number(s.dataset.min);
+    s.querySelector('.meta').textContent = '步驟 ' + (i + 1) + ' / ' + sections.length + (min ? '　·　約 ' + min + ' 分鐘' : '');
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = i + 1;
+    const label = document.createElement('span');
+    label.textContent = s.dataset.title;
+    b.append(num, label);
+    b.addEventListener('click', function () { go(i); nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); });
+    li.append(b);
+    list.append(li);
+    return b;
+  });
+
+  // 換頁並把步驟寫進網址（#3），重新整理或分享連結時會停在同一步。
+  function go(i) {
+    show(i);
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* 有些預覽環境不能改網址，不影響換頁 */ }
+  }
+
+  function fromHash() {
+    const i = parseInt(location.hash.slice(1), 10) - 1;
+    return i >= 0 && i < sections.length ? i : 0;
+  }
+
+  function show(i) {
+    seen.add(i);
+    sections.forEach(function (s, j) { s.classList.toggle('active', j === i); });
+    buttons.forEach(function (b, j) {
+      if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.classList.toggle('seen', seen.has(j) && j !== i);
+    });
+    prev.hidden = i === 0;
+    next.hidden = i === sections.length - 1;
+    mobileLabel.textContent = (i + 1) + ' / ' + sections.length + '　' + sections[i].dataset.title;
+    document.title = sections[i].dataset.title + '｜建立 Google Sheet 資料來源';
+    window.scrollTo(0, 0);
+  }
+
+  prev.addEventListener('click', function () { go(Math.max(0, current() - 1)); });
+  next.addEventListener('click', function () { go(Math.min(sections.length - 1, current() + 1)); });
+  function current() { return sections.findIndex(function (s) { return s.classList.contains('active'); }); }
+  toggle.addEventListener('click', function () {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  window.addEventListener('hashchange', function () { show(fromHash()); });
+
+  // 複製按鈕：學員照抄的值一律用複製，避免打錯字。
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+  }
+  document.querySelectorAll('.cp').forEach(function (wrap) {
+    const text = wrap.querySelector('code').textContent;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '複製';
+    b.setAttribute('aria-label', '複製 ' + text);
+    b.addEventListener('click', function () {
+      copyText(text).then(function () { b.textContent = '已複製 ✓'; }, function () { b.textContent = '請手動選取'; });
+      setTimeout(function () { b.textContent = '複製'; }, 1500);
+    });
+    wrap.append(b);
+  });
+
+  show(fromHash());
+})();
+</script>
+</body>
+</html>
