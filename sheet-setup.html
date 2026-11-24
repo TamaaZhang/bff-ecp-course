@@ -36,7 +36,7 @@ nav button[aria-current="step"] { background: var(--accent-soft); color: var(--a
 nav .num { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: grid; place-items: center; font-size: 13px; }
 nav button[aria-current="step"] .num { border-color: var(--accent); background: var(--accent); color: var(--bg); }
 nav .seen .num { border-color: var(--done); color: var(--done); }
-main { padding: 32px 48px 48px; max-width: 900px; width: 100%; }
+main { padding: 32px 48px 48px; max-width: 1000px; width: 100%; margin: 0 auto; }
 .mobile-bar { display: none; }
 section[data-step] { display: none; }
 section[data-step].active { display: block; }
@@ -53,6 +53,8 @@ code { font-family: Consolas, "SF Mono", Menlo, monospace; background: var(--cod
 .cp button:hover { background: var(--accent-soft); }
 .cp button:focus-visible { outline: 2px solid var(--accent); }
 .path { font-weight: 600; }
+/* 欄位設定表：格子不換行，太寬就在表格內左右捲動，避免一個字一行。 */
+table.fields th, table.fields td { white-space: nowrap; }
 .cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
 .cp.block code { padding: 0; background: none; word-break: break-all; }
 .cp.block button { flex: none; }
@@ -69,6 +71,17 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pager button.next { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; margin-left: auto; }
 .pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pager button[hidden] { display: none; }
+@media (min-width: 1600px) {
+  body { font-size: 17px; }
+  .layout { grid-template-columns: 320px 1fr; }
+  main { max-width: 1100px; }
+}
+@media (max-width: 1200px) {
+  .layout { grid-template-columns: 240px 1fr; }
+  main { padding: 28px 28px 40px; }
+  nav button { padding: 8px 14px; }
+  nav .title, nav .total, nav .home { padding-left: 14px; padding-right: 14px; }
+}
 @media (max-width: 800px) {
   .layout { display: block; }
   nav { display: none; position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
