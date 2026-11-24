@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BFF 實作課</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
+  --accent: #1a73e8; --accent-soft: #e8f0fe;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16181c; --panel: #1f2227; --text: #e6e8eb; --muted: #a0a8b2; --line: #363b42;
+    --accent: #8ab4f8; --accent-soft: #23324a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.7 system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 48px 16px; }
+h1 { font-size: 28px; margin: 0 0 8px; }
+.lead { color: var(--muted); margin: 0 0 32px; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 32px; font-size: 15px; }
+th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; }
+th { background: var(--panel); white-space: nowrap; }
+h2 { font-size: 18px; margin: 0 0 12px; }
+.cards { display: grid; gap: 12px; }
+a.card { display: block; padding: 16px 20px; border: 1px solid var(--line); border-radius: 8px; color: inherit; text-decoration: none; }
+a.card:hover { border-color: var(--accent); background: var(--accent-soft); }
+a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card .tag { color: var(--accent); font-size: 13px; font-weight: 600; }
+.card .name { font-size: 17px; font-weight: 700; }
+.card .desc { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BFF 實作課：會議室預約看板</h1>
+  <p class="lead">程式由 AI 照規範寫，你負責看懂和驗收。先用 Google Sheet 當資料來源，再整個改接 ECP。</p>
+
+  <table>
+    <tr><th>階段</th><th>做什麼</th><th>資料來源</th></tr>
+    <tr><td>一</td><td>查詢</td><td>Google Sheet</td></tr>
+    <tr><td>二</td><td>新增、修改、刪除</td><td>Google Sheet</td></tr>
+    <tr><td>三</td><td>用 QS 建 ECP 單元、手動建一兩筆資料</td><td>本地 ECP</td></tr>
+    <tr><td>四</td><td>整個改接 ECP（前端、GraphQL、業務規則都不用改）</td><td>本地 ECP</td></tr>
+  </table>
+
+  <h2>操作說明</h2>
+  <div class="cards">
+    <a class="card" href="ecp-units.html">
+      <div class="tag">階段三</div>
+      <div class="name">在本地 ECP 建立會議室預約單元</div>
+      <div class="desc">建字典、兩個單元與欄位，手動建範例資料。不用寫程式，約 30 分鐘。</div>
+    </a>
+  </div>
+</main>
+</body>
+</html>
