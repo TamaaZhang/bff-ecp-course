@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>建立 ECP 單元</title>
+<title>階段二：建立 ECP 單元</title>
 <style>
 :root {
   --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
@@ -101,7 +101,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <div class="layout">
   <nav id="toc" aria-label="步驟">
     <a class="home" id="home" href="./" hidden>← 課程首頁</a>
-    <div class="title">階段三：建立 ECP 單元</div>
+    <div class="title">階段二：建立 ECP 單元</div>
     <div class="total" id="total"></div>
     <ol id="toc-list"></ol>
   </nav>
@@ -110,7 +110,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <section data-step data-min="2" data-title="概覽">
   <h1>概覽</h1>
   <div class="meta"></div>
-  <p>做完這份說明，你的本地 ECP 會有兩個單元（「會議室」「會議室預約」），以及和 Google Sheet 一樣的範例資料。階段四的 BFF 會改從這兩個單元讀寫資料。</p>
+  <p>做完這份說明，你的本地 ECP 會有兩個單元（「會議室」「會議室預約」），以及和 Google Sheet 一樣的範例資料。階段三的 BFF 會改從這兩個單元讀寫資料。</p>
   <p><strong>不用寫程式</strong>，全部在 ECP 畫面上用 QS（快速設定）完成。</p>
   <h2>你會做的事</h2>
   <ul>
@@ -219,7 +219,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <section data-step data-min="5" data-title="手動建範例資料">
   <h1>手動建範例資料</h1>
   <div class="meta"></div>
-  <p>和 Google Sheet 的範例一樣，方便你在階段四比對：換了資料來源，看板顯示的結果要相同。</p>
+  <p>和 Google Sheet 的範例一樣，方便你在階段三比對：換了資料來源，看板顯示的結果要相同。</p>
   <h2>會議室</h2>
   <p>打開「會議室」單元 → 新增：</p>
   <table>
@@ -240,7 +240,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <section data-step data-min="1" data-title="記下要給 BFF 的設定">
   <h1>記下要給 BFF 的設定</h1>
   <div class="meta"></div>
-  <p>這些是<strong>公開資訊</strong>，階段四可以直接在對話裡告訴 AI：</p>
+  <p>這些是<strong>公開資訊</strong>，階段三可以直接在對話裡告訴 AI：</p>
   <table>
     <tr><th>項目</th><th>值</th></tr>
     <tr><td>ECP 網址</td><td><span class="cp"><code>http://127.0.0.1:22821/aipower</code></span></td></tr>
@@ -248,9 +248,10 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <tr><td>會議室單元編碼</td><td><span class="cp"><code>Demo.MeetingRoom</code></span></td></tr>
     <tr><td>預約單元編碼</td><td><span class="cp"><code>Demo.MeetingRoomApply</code></span></td></tr>
   </table>
-  <div class="warn"><p><strong>密碼是秘密</strong>：階段四只寫在 <code>bff/.env</code> 的 <code>ECP_LOGIN_PASSWORD=</code>，不要貼到 AI 對話裡。</p></div>
+  <div class="warn"><p><strong>密碼是秘密</strong>：階段三只寫在 <code>bff/.env</code> 的 <code>ECP_LOGIN_PASSWORD=</code>，不要貼到 AI 對話裡。</p></div>
   <h2>做完了</h2>
-  <p>用 <code>/bff-verify</code> 選「階段三」驗收（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫在 <code>驗收檢核表/STEP3_建立ECP單元.md</code>。</p>
+  <p>用 <code>/bff-verify</code> 選「階段二」驗收（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫在 <code>驗收檢核表/2_建立ECP單元.md</code>。</p>
+  <p>下一步：<a href="stage3.html">階段三：改接 ECP</a>。</p>
 </section>
 
 <section data-step data-min="0" data-title="常見問題">
@@ -260,7 +261,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <tr><th>看到</th><th>原因</th></tr>
     <tr><td>新增預約時「會議室」選不到東西</td><td>還沒在「會議室」建資料，或實體框沒有選 <code>Demo.MeetingRoom</code></td></tr>
     <tr><td>「地點」下拉是空的</td><td>字典沒有字典項，或欄位沒有選「會議室地點」字典</td></tr>
-    <tr><td>編碼或資料庫欄位打錯了</td><td>改成表格上的名稱；改不了就刪掉單元重建。或者階段四告訴 AI 你實際用的名稱</td></tr>
+    <tr><td>編碼或資料庫欄位打錯了</td><td>改成表格上的名稱；改不了就刪掉單元重建。或者階段三告訴 AI 你實際用的名稱</td></tr>
     <tr><td>想全部重來</td><td><code>重設ECP.cmd</code>（Mac：<code>bash ecp.sh reset</code>），<strong>ECP 裡的資料會全部刪除</strong></td></tr>
   </table>
 </section>
@@ -327,7 +328,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     prev.hidden = i === 0;
     next.hidden = i === sections.length - 1;
     mobileLabel.textContent = (i + 1) + ' / ' + sections.length + '　' + sections[i].dataset.title;
-    document.title = sections[i].dataset.title + '｜建立 ECP 單元';
+    document.title = sections[i].dataset.title + '｜階段二：建立 ECP 單元';
     window.scrollTo(0, 0);
   }
 

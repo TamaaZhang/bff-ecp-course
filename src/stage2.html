@@ -1,0 +1,161 @@
+<!-- title: 階段二：建立 ECP 單元 -->
+
+<section data-step data-min="2" data-title="概覽">
+  <h1>概覽</h1>
+  <div class="meta"></div>
+  <p>做完這份說明，你的本地 ECP 會有兩個單元（「會議室」「會議室預約」），以及和 Google Sheet 一樣的範例資料。階段三的 BFF 會改從這兩個單元讀寫資料。</p>
+  <p><strong>不用寫程式</strong>，全部在 ECP 畫面上用 QS（快速設定）完成。</p>
+  <h2>你會做的事</h2>
+  <ul>
+    <li>建一個字典（下拉選單的選項）</li>
+    <li>建兩個單元，並設定它們的欄位</li>
+    <li>手動建 2 間會議室、2 筆預約</li>
+  </ul>
+  <h2>開始前</h2>
+  <ol class="steps">
+    <li>本地 ECP 已啟動（Windows 雙擊 <code>啟動ECP.cmd</code>；Mac 執行 <code>bash ecp.sh start</code>）。</li>
+    <li>瀏覽器打開 <span class="cp"><code>http://127.0.0.1:22821/aipower/</code></span>，用 <span class="cp"><code>administrator</code></span> 登入（密碼在 <code>初始密碼.txt</code>）。</li>
+  </ol>
+  <div class="note"><p>ECP 沒辦法直接匯入 Excel，所以資料要手動建。只要建一兩筆就好，之後的資料由你做好的看板新增。</p></div>
+</section>
+
+<section data-step data-min="2" data-title="為什麼要照表填">
+  <h1>為什麼要照表填</h1>
+  <div class="meta"></div>
+  <p>BFF 是照「單元編碼」和「資料庫欄位」的名稱讀寫資料，<strong>名稱錯一個字就讀不到</strong>。</p>
+  <div class="warn"><p>有「複製」按鈕的值，請按按鈕複製再貼上，<strong>不要自己打</strong>（大小寫也要一樣）。中文標題可以自己改，不影響 BFF。</p></div>
+  <h2>Sheet 和 ECP 的對照</h2>
+  <table>
+    <tr><th>你在 Sheet 看到的</th><th>在 ECP 對應的</th></tr>
+    <tr><td>一個工作表（「會議室」「預約」）</td><td>一個單元（<code>Demo.MeetingRoom</code>、<code>Demo.MeetingRoomApply</code>）</td></tr>
+    <tr><td>第一列的欄名（「主旨」「開始時間」…）</td><td>欄位的「資料庫欄位」（<code>FName</code>、<code>FNormalMeetingStartDateTime</code>…）</td></tr>
+    <tr><td>一列資料</td><td>一筆資料，ECP 自動給一個 <code>FId</code> 當編號</td></tr>
+    <tr><td>會議室編號 <code>R01</code></td><td>「實體框」直接選會議室，存的是會議室的 <code>FId</code></td></tr>
+  </table>
+</section>
+
+<section data-step data-min="5" data-title="建字典「會議室地點」">
+  <h1>建字典「會議室地點」</h1>
+  <div class="meta"></div>
+  <p>字典就是下拉選單的選項：資料庫存英文代碼，畫面顯示中文。</p>
+  <ol class="steps">
+    <li>左側選單 <span class="path">系統管理 → 基礎設定 → 其他 → 字典設定</span>。</li>
+    <li>按「新增」，名稱填 <span class="cp"><code>會議室地點</code></span>，儲存。</li>
+    <li>在這個字典新增兩個字典項：
+      <table>
+        <tr><th>值（存進資料庫）</th><th>顯示文字</th></tr>
+        <tr><td><span class="cp"><code>Taipei</code></span></td><td>台北</td></tr>
+        <tr><td><span class="cp"><code>OtherSite</code></span></td><td>其他據點</td></tr>
+      </table>
+    </li>
+    <li>儲存。</li>
+  </ol>
+</section>
+
+<section data-step data-min="8" data-title="建單元「會議室」">
+  <h1>建單元「會議室」</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li><span class="path">系統管理 → 進階設定 → 單元設定</span>，按「新增」。</li>
+    <li>基本資料：
+      <table>
+        <tr><th>項目</th><th>值</th></tr>
+        <tr><td>名稱</td><td>會議室</td></tr>
+        <tr><td>編碼</td><td><span class="cp"><code>Demo.MeetingRoom</code></span></td></tr>
+        <tr><td>所屬模組</td><td>通用功能</td></tr>
+        <tr><td>資料表</td><td><span class="cp"><code>TpDemoMeetingRoom</code></span></td></tr>
+        <tr><td>支援項目</td><td>全部不勾</td></tr>
+      </table>
+    </li>
+    <li>儲存後，進「欄位設置」。單元已經有一個預設的名稱欄位 <code>FName</code>，把它的標題改成「會議室名稱」。再新增兩個欄位：
+      <table class="fields">
+        <tr><th>標題</th><th>資料庫欄位</th><th>類型</th><th>長度</th><th>字典</th><th>必填</th><th>支援查詢</th></tr>
+        <tr><td>會議室名稱</td><td><code>FName</code>（預設已有）</td><td>文字方塊</td><td>預設</td><td>—</td><td>✓</td><td>✓</td></tr>
+        <tr><td>地點</td><td><span class="cp"><code>FMeetingRoomLocation</code></span></td><td>只選下拉清單</td><td>32</td><td>會議室地點</td><td>✓</td><td>✓</td></tr>
+        <tr><td>樓層</td><td><span class="cp"><code>FMeetingRoomFloor</code></span></td><td>文字方塊</td><td>32</td><td>—</td><td></td><td>✓</td></tr>
+      </table>
+    </li>
+    <li>儲存單元設定。</li>
+  </ol>
+</section>
+
+<section data-step data-min="10" data-title="建單元「會議室預約」">
+  <h1>建單元「會議室預約」</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>「單元設定」再按「新增」。</li>
+    <li>基本資料：
+      <table>
+        <tr><th>項目</th><th>值</th></tr>
+        <tr><td>名稱</td><td>會議室預約</td></tr>
+        <tr><td>編碼</td><td><span class="cp"><code>Demo.MeetingRoomApply</code></span></td></tr>
+        <tr><td>所屬模組</td><td>通用功能</td></tr>
+        <tr><td>資料表</td><td><span class="cp"><code>TpDemoMeetingRoomApply</code></span></td></tr>
+        <tr><td>支援項目</td><td>只勾「記錄建立資訊」（會自動記下建立者、建立時間）</td></tr>
+      </table>
+      不勾「支援工作流」：預約新增後直接生效，不用簽核。
+    </li>
+    <li>「欄位設置」：預設的名稱欄位 <code>FName</code> 標題改成「會議主旨」，再新增三個欄位：
+      <table class="fields">
+        <tr><th>標題</th><th>資料庫欄位</th><th>類型</th><th>字典／實體</th><th>必填</th><th>支援查詢</th></tr>
+        <tr><td>會議主旨</td><td><code>FName</code>（預設已有）</td><td>文字方塊</td><td>—</td><td>✓</td><td>✓</td></tr>
+        <tr><td>會議室</td><td><span class="cp"><code>FMeetingRoomId</code></span></td><td>實體框</td><td>會議室（<code>Demo.MeetingRoom</code>）</td><td>✓</td><td>✓</td></tr>
+        <tr><td>開始時間</td><td><span class="cp"><code>FNormalMeetingStartDateTime</code></span></td><td>日期時間框</td><td>—</td><td>✓</td><td>✓</td></tr>
+        <tr><td>結束時間</td><td><span class="cp"><code>FNormalMeetingEndDateTime</code></span></td><td>日期時間框</td><td>—</td><td>✓</td><td>✓</td></tr>
+      </table>
+    </li>
+    <li>儲存單元設定。</li>
+  </ol>
+  <div class="note"><p>預約<strong>不存地點、樓層</strong>：這兩個值屬於會議室，預約只記「哪一間會議室」。BFF 查詢時再從「會議室」帶出地點、樓層。和 Sheet 版「預約」只放會議室編號是同一個道理。</p></div>
+</section>
+
+<section data-step data-min="5" data-title="手動建範例資料">
+  <h1>手動建範例資料</h1>
+  <div class="meta"></div>
+  <p>和 Google Sheet 的範例一樣，方便你在階段三比對：換了資料來源，看板顯示的結果要相同。</p>
+  <h2>會議室</h2>
+  <p>打開「會議室」單元 → 新增：</p>
+  <table>
+    <tr><th>會議室名稱</th><th>地點</th><th>樓層</th></tr>
+    <tr><td>九樓討論室</td><td>台北</td><td>9樓</td></tr>
+    <tr><td>十樓大會議室</td><td>台北</td><td>10樓</td></tr>
+  </table>
+  <h2>會議室預約</h2>
+  <p>打開「會議室預約」單元 → 新增，日期填<strong>今天</strong>：</p>
+  <table>
+    <tr><th>會議主旨</th><th>會議室</th><th>開始</th><th>結束</th></tr>
+    <tr><td>專案週會</td><td>九樓討論室</td><td>今天 09:00</td><td>今天 10:00</td></tr>
+    <tr><td>客戶簡報</td><td>十樓大會議室</td><td>今天 14:00</td><td>今天 15:30</td></tr>
+  </table>
+  <div class="note"><p>ECP 的資料不會像 Sheet 的 <code>=TODAY()</code> 每天自動變成今天。之後練習時，看板查<strong>建資料的那一天</strong>就看得到。</p></div>
+</section>
+
+<section data-step data-min="1" data-title="記下要給 BFF 的設定">
+  <h1>記下要給 BFF 的設定</h1>
+  <div class="meta"></div>
+  <p>這些是<strong>公開資訊</strong>，階段三可以直接在對話裡告訴 AI：</p>
+  <table>
+    <tr><th>項目</th><th>值</th></tr>
+    <tr><td>ECP 網址</td><td><span class="cp"><code>http://127.0.0.1:22821/aipower</code></span></td></tr>
+    <tr><td>帳號</td><td><span class="cp"><code>administrator</code></span></td></tr>
+    <tr><td>會議室單元編碼</td><td><span class="cp"><code>Demo.MeetingRoom</code></span></td></tr>
+    <tr><td>預約單元編碼</td><td><span class="cp"><code>Demo.MeetingRoomApply</code></span></td></tr>
+  </table>
+  <div class="warn"><p><strong>密碼是秘密</strong>：階段三只寫在 <code>bff/.env</code> 的 <code>ECP_LOGIN_PASSWORD=</code>，不要貼到 AI 對話裡。</p></div>
+  <h2>做完了</h2>
+  <p>用 <code>/bff-verify</code> 選「階段二」驗收（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫在 <code>驗收檢核表/2_建立ECP單元.md</code>。</p>
+  <p>下一步：<a href="stage3.html">階段三：改接 ECP</a>。</p>
+</section>
+
+<section data-step data-min="0" data-title="常見問題">
+  <h1>常見問題</h1>
+  <div class="meta"></div>
+  <table>
+    <tr><th>看到</th><th>原因</th></tr>
+    <tr><td>新增預約時「會議室」選不到東西</td><td>還沒在「會議室」建資料，或實體框沒有選 <code>Demo.MeetingRoom</code></td></tr>
+    <tr><td>「地點」下拉是空的</td><td>字典沒有字典項，或欄位沒有選「會議室地點」字典</td></tr>
+    <tr><td>編碼或資料庫欄位打錯了</td><td>改成表格上的名稱；改不了就刪掉單元重建。或者階段三告訴 AI 你實際用的名稱</td></tr>
+    <tr><td>想全部重來</td><td><code>重設ECP.cmd</code>（Mac：<code>bash ecp.sh reset</code>），<strong>ECP 裡的資料會全部刪除</strong></td></tr>
+  </table>
+</section>
+

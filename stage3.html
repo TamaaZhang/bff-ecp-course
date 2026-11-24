@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>階段三：改接 ECP</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
+  --accent: #1a73e8; --accent-soft: #e8f0fe; --done: #188038;
+  --note-bg: #fef7e0; --note-line: #f9ab00; --warn-bg: #fce8e6; --warn-line: #d93025;
+  --code-bg: #eef1f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16181c; --panel: #1f2227; --text: #e6e8eb; --muted: #a0a8b2; --line: #363b42;
+    --accent: #8ab4f8; --accent-soft: #23324a; --done: #81c995;
+    --note-bg: #3a3220; --note-line: #f9ab00; --warn-bg: #3d2523; --warn-line: #f28b82;
+    --code-bg: #2a2e35;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 16px/1.7 system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif; }
+.layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+nav { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .title { padding: 0 20px 4px; font-weight: 700; font-size: 17px; }
+nav .home { display: block; padding: 0 20px 12px; color: var(--accent); font-size: 14px; text-decoration: none; }
+nav .home[hidden] { display: none; }
+nav .total { padding: 0 20px 16px; color: var(--muted); font-size: 14px; }
+nav ol { list-style: none; margin: 0; padding: 0; }
+nav button { all: unset; box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 20px; cursor: pointer; color: var(--text); font-size: 15px; line-height: 1.5; }
+nav button:hover { background: var(--accent-soft); }
+nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+nav button[aria-current="step"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+nav .num { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: grid; place-items: center; font-size: 13px; }
+nav button[aria-current="step"] .num { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+nav .seen .num { border-color: var(--done); color: var(--done); }
+main { padding: 32px 48px 48px; max-width: 1000px; width: 100%; margin: 0 auto; }
+.mobile-bar { display: none; }
+section[data-step] { display: none; }
+section[data-step].active { display: block; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+.meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+h2 { font-size: 18px; margin: 28px 0 8px; }
+ol.steps > li { margin-bottom: 14px; }
+table { border-collapse: collapse; margin: 10px 0 16px; font-size: 15px; display: block; overflow-x: auto; max-width: 100%; }
+th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
+th { background: var(--panel); white-space: nowrap; }
+code { font-family: Consolas, "SF Mono", Menlo, monospace; background: var(--code-bg); border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+.cp { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.cp button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; line-height: 20px; }
+.cp button:hover { background: var(--accent-soft); }
+.cp button:focus-visible { outline: 2px solid var(--accent); }
+.path { font-weight: 600; }
+/* 欄位設定表：格子不換行，太寬就在表格內左右捲動，避免一個字一行。 */
+table.fields th, table.fields td { white-space: nowrap; }
+.cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+.cp.block code { padding: 0; background: none; word-break: break-all; }
+.cp.block button { flex: none; }
+a { color: var(--accent); }
+a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
+a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note, .warn { border-left: 4px solid; border-radius: 4px; padding: 10px 14px; margin: 14px 0; }
+.note { background: var(--note-bg); border-color: var(--note-line); }
+.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.note > :first-child, .warn > :first-child { margin-top: 0; }
+.note > :last-child, .warn > :last-child { margin-bottom: 0; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+.pager button { font: inherit; padding: 8px 20px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.pager button.next { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; margin-left: auto; }
+.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pager button[hidden] { display: none; }
+@media (min-width: 1600px) {
+  body { font-size: 17px; }
+  .layout { grid-template-columns: 320px 1fr; }
+  main { max-width: 1100px; }
+}
+@media (max-width: 1200px) {
+  .layout { grid-template-columns: 240px 1fr; }
+  main { padding: 28px 28px 40px; }
+  nav button { padding: 8px 14px; }
+  nav .title, nav .total, nav .home { padding-left: 14px; padding-right: 14px; }
+}
+@media (max-width: 800px) {
+  .layout { display: block; }
+  nav { display: none; position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  nav.open { display: block; }
+  .mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 1; background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+  .mobile-bar button { font: inherit; font-size: 14px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); }
+  main { padding: 20px 16px 32px; }
+  h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-bar">
+  <span id="mobile-label"></span>
+  <button type="button" id="menu-toggle" aria-expanded="false" aria-controls="toc">所有步驟</button>
+</div>
+<div class="layout">
+  <nav id="toc" aria-label="步驟">
+    <a class="home" id="home" href="./" hidden>← 課程首頁</a>
+    <div class="title">階段三：改接 ECP</div>
+    <div class="total" id="total"></div>
+    <ol id="toc-list"></ol>
+  </nav>
+  <main>
+
+<section data-step data-min="0" data-title="準備中">
+  <h1>準備中</h1>
+  <div class="meta"></div>
+  <p>這個階段的教材還在準備中。</p>
+  <p>到時候你會請 AI 在 BFF 加一個「ECP 轉接層」，把資料來源從 Google Sheet 換成階段二建好的 ECP 單元。前端、GraphQL、業務規則都不用改，這就是 BFF 分層的好處。</p>
+  <p>先完成 <a href="stage2.html">階段二：建立 ECP 單元</a>，並記下那一頁最後整理的設定。</p>
+</section>
+
+    <div class="pager">
+      <button type="button" id="prev">← 上一步</button>
+      <button type="button" class="next" id="next">下一步 →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const sections = Array.from(document.querySelectorAll('section[data-step]'));
+  const list = document.getElementById('toc-list');
+  const nav = document.getElementById('toc');
+  const toggle = document.getElementById('menu-toggle');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const mobileLabel = document.getElementById('mobile-label');
+  const seen = new Set();
+  // 放在教學網站上才有首頁；學員直接打開檔案時不顯示這個連結。
+  if (location.protocol === 'https:' || location.protocol === 'http:') document.getElementById('home').hidden = false;
+
+  const total = sections.reduce(function (sum, s) { return sum + Number(s.dataset.min); }, 0);
+  document.getElementById('total').textContent = '預計 ' + total + ' 分鐘';
+
+  const buttons = sections.map(function (s, i) {
+    const min = Number(s.dataset.min);
+    s.querySelector('.meta').textContent = '步驟 ' + (i + 1) + ' / ' + sections.length + (min ? '　·　約 ' + min + ' 分鐘' : '');
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = i + 1;
+    const label = document.createElement('span');
+    label.textContent = s.dataset.title;
+    b.append(num, label);
+    b.addEventListener('click', function () { go(i); nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); });
+    li.append(b);
+    list.append(li);
+    return b;
+  });
+
+  // 換頁並把步驟寫進網址（#3），重新整理或分享連結時會停在同一步。
+  function go(i) {
+    show(i);
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* 有些預覽環境不能改網址，不影響換頁 */ }
+  }
+
+  function fromHash() {
+    const i = parseInt(location.hash.slice(1), 10) - 1;
+    return i >= 0 && i < sections.length ? i : 0;
+  }
+
+  function show(i) {
+    seen.add(i);
+    sections.forEach(function (s, j) { s.classList.toggle('active', j === i); });
+    buttons.forEach(function (b, j) {
+      if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.classList.toggle('seen', seen.has(j) && j !== i);
+    });
+    prev.hidden = i === 0;
+    next.hidden = i === sections.length - 1;
+    mobileLabel.textContent = (i + 1) + ' / ' + sections.length + '　' + sections[i].dataset.title;
+    document.title = sections[i].dataset.title + '｜階段三：改接 ECP';
+    window.scrollTo(0, 0);
+  }
+
+  prev.addEventListener('click', function () { go(Math.max(0, current() - 1)); });
+  next.addEventListener('click', function () { go(Math.min(sections.length - 1, current() + 1)); });
+  function current() { return sections.findIndex(function (s) { return s.classList.contains('active'); }); }
+  toggle.addEventListener('click', function () {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  window.addEventListener('hashchange', function () { show(fromHash()); });
+
+  // 複製按鈕：學員照抄的值一律用複製，避免打錯字。
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+  }
+  document.querySelectorAll('.cp').forEach(function (wrap) {
+    const text = wrap.querySelector('code').textContent;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '複製';
+    b.setAttribute('aria-label', '複製 ' + text);
+    b.addEventListener('click', function () {
+      copyText(text).then(function () { b.textContent = '已複製 ✓'; }, function () { b.textContent = '請手動選取'; });
+      setTimeout(function () { b.textContent = '複製'; }, 1500);
+    });
+    wrap.append(b);
+  });
+
+  show(fromHash());
+})();
+</script>
+</body>
+</html>

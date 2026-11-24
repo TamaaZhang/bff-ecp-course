@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>建立 Google Sheet 資料來源</title>
+<title>階段一：Sheet 版</title>
 <style>
 :root {
   --bg: #ffffff; --panel: #f6f7f9; --text: #1f2328; --muted: #59636e; --line: #d8dee4;
@@ -101,26 +101,28 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <div class="layout">
   <nav id="toc" aria-label="步驟">
     <a class="home" id="home" href="./" hidden>← 課程首頁</a>
-    <div class="title">階段一準備：建立 Google Sheet 資料來源</div>
+    <div class="title">階段一：Sheet 版</div>
     <div class="total" id="total"></div>
     <ol id="toc-list"></ol>
   </nav>
   <main>
 
-<section data-step data-min="1" data-title="概覽">
+<section data-step data-min="2" data-title="概覽">
   <h1>概覽</h1>
   <div class="meta"></div>
-  <p>做完這份說明，你會有：</p>
-  <ul>
-    <li>一份放會議室與預約資料的 Google 試算表</li>
-    <li>一個給 BFF 呼叫的 Apps Script API（整門課只要部署這一次）</li>
-    <li>填好的 <code>bff/.env</code></li>
-  </ul>
+  <p>這個階段用 Google 試算表當資料來源，做出一個會議室預約看板。分三段：</p>
+  <table>
+    <tr><th>段落</th><th>做什麼</th><th>誰動手</th></tr>
+    <tr><td>準備（A～E）</td><td>建試算表、部署 Apps Script、產生通行碼、填 <code>bff/.env</code></td><td>你</td></tr>
+    <tr><td>1A 查詢</td><td>選日期、看那天的預約</td><td>AI 寫程式，你驗收</td></tr>
+    <tr><td>1B 新增、修改、刪除</td><td>在看板上新增、修改、刪除預約</td><td>AI 寫程式，你驗收</td></tr>
+  </table>
+  <p>1A、1B 分開做：先把查詢做好、驗收通過，再加上新增、修改、刪除。程式一次只多一點，比較看得懂，出錯也比較好找。</p>
   <h2>需要</h2>
   <ul>
     <li>一個 Google 帳號（個人 Gmail 最保險；公司或學校帳號可能被管理者關掉 Apps Script）</li>
-    <li>已安裝 Node.js 22.9 以上（產生通行碼會用到）</li>
-    <li>學員起始包（裡面有 <code>bff/.env.example</code>）</li>
+    <li>已安裝 Node.js 22.9 以上（終端機執行 <code>node --version</code> 確認）</li>
+    <li>學員起始包，以及 Claude Code（或 Codex）</li>
   </ul>
 </section>
 
@@ -156,6 +158,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。</li>
     <li>刪掉編輯器裡原本的內容，把起始包的 <code>sheet/Code.gs</code> 整份貼上，按儲存（磁碟片圖示）。</li>
   </ol>
+  <p>這一份 <code>Code.gs</code> 已經包含 1A 查詢和 1B 新增、修改、刪除要用的功能，整個階段只要部署這一次。</p>
 </section>
 
 <section data-step data-min="3" data-title="C. 產生通行碼">
@@ -194,7 +197,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <h1>E. 填寫 <code>bff/.env</code></h1>
   <div class="meta"></div>
   <ol class="steps">
-    <li>把 <code>bff/.env.example</code> 複製一份，改名為 <code>bff/.env</code>（同一個資料夾）。</li>
+    <li>把起始包的 <code>bff/.env.example</code> 複製一份，改名為 <code>bff/.env</code>（同一個資料夾）。</li>
     <li>填入（等號後面直接接值，不用加引號）：
       <table>
         <tr><th>這一行</th><th>填什麼</th></tr>
@@ -211,8 +214,78 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <tr><td>工作表名稱、欄位名稱</td><td>可以</td></tr>
     <tr><td>通行碼</td><td><strong>不可以</strong>，只寫在 <code>bff/.env</code></td></tr>
   </table>
-  <h2>做完了</h2>
-  <p>在起始包資料夾用 Claude Code 輸入 <code>/bff-step1-sheet-query</code>（Codex：貼上 <code>提示詞/STEP1_查詢.md</code>），開始階段一。</p>
+</section>
+
+<section data-step data-min="15" data-title="1A 查詢：請 AI 寫程式">
+  <h1>1A 查詢：請 AI 寫程式</h1>
+  <div class="meta"></div>
+  <p>做出來的樣子：在網頁選一個日期、按「查詢」，看到那天所有會議室預約，依開始時間排序。</p>
+  <ol class="steps">
+    <li>用 Claude Code 打開起始包資料夾（桌面 App 的 Code 分頁 → 選擇這個資料夾）。</li>
+    <li>輸入：<span class="cp"><code>/bff-sheet-query</code></span><br>
+      Codex 使用者：把起始包 <code>提示詞/1A_查詢.md</code> 的內容整份貼上。</li>
+    <li>AI 會先問你三件事：A～E 做完了嗎、試算表有今天的預約嗎、Node 版本對嗎。都是就回答「是」。</li>
+    <li>AI 開始寫程式（時間依電腦和 AI 速度而定）。它每寫完一個檔案會說明那個檔案負責什麼，邊看邊問沒關係。</li>
+    <li>AI 寫完會告訴你下一步：在 <code>bff</code> 資料夾執行 <code>npm start</code>，打開 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>。</li>
+  </ol>
+  <div class="warn"><p>AI 如果要你把通行碼貼到對話裡，<strong>不要貼</strong>。通行碼只放在 <code>bff/.env</code>。</p></div>
+</section>
+
+<section data-step data-min="10" data-title="1A 驗收">
+  <h1>1A 驗收</h1>
+  <div class="meta"></div>
+  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「1A」（Codex：貼上 <code>提示詞/驗收.md</code>）。AI 會一次給你一個動作，你自己操作、回報結果，再把結果寫進起始包的 <code>驗收檢核表/1A_查詢.md</code>。</p>
+  <h2>你會做的 5 件事</h2>
+  <table>
+    <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
+    <tr><td>1</td><td>查今天</td><td>「專案週會」「客戶簡報」，依開始時間排序</td></tr>
+    <tr><td>2</td><td>查明天</td><td>「新人訓練」</td></tr>
+    <tr><td>3</td><td>查一個沒有預約的日期</td><td>「這天沒有預約」</td></tr>
+    <tr><td>4</td><td>在試算表「預約」加一列今天的預約，回網頁再查</td><td>新的那筆出現，不用重啟 BFF</td></tr>
+    <tr><td>5</td><td>用瀏覽器開發者工具送一個錯的日期（AI 會給你指令）</td><td><code>DATA-422</code>、<code>invalid_date</code>，而且有 <code>requestId</code></td></tr>
+  </table>
+</section>
+
+<section data-step data-min="15" data-title="1B 新增、修改、刪除：請 AI 寫程式">
+  <h1>1B 新增、修改、刪除：請 AI 寫程式</h1>
+  <div class="meta"></div>
+  <p>做出來的樣子：看板上方多一個「新增預約」表單；每一筆預約多「修改」「刪除」按鈕；時段和同一間會議室的其他預約重疊時，會擋下來。</p>
+  <ol class="steps">
+    <li>先停掉 BFF（在跑 <code>npm start</code> 的終端機按 Ctrl+C）。</li>
+    <li>在 Claude Code 輸入：<span class="cp"><code>/bff-sheet-crud</code></span><br>
+      Codex 使用者：貼上 <code>提示詞/1B_增刪改.md</code>。</li>
+    <li>AI 會先確認：1A 驗收通過了嗎、Apps Script 是起始包那份 <code>Code.gs</code> 嗎。照 A～D 做的話都是「是」。</li>
+    <li>AI 會沿用 1A 的程式，只加新的部分。寫完後重新 <code>npm start</code>，打開網頁。</li>
+  </ol>
+  <div class="note"><p>每次新增要經過 Google 三次（查會議室、查同一天的預約、寫入），大約要等幾秒。送出時按鈕會先停用，避免連按送出兩次。</p></div>
+</section>
+
+<section data-step data-min="10" data-title="1B 驗收">
+  <h1>1B 驗收</h1>
+  <div class="meta"></div>
+  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「1B」，結果寫進 <code>驗收檢核表/1B_增刪改.md</code>。每一項都<strong>同時看網頁和試算表</strong>。</p>
+  <h2>你會做的 5 件事</h2>
+  <table>
+    <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
+    <tr><td>1</td><td>新增一筆今天 16:00–17:00 的預約</td><td>表格出現新的那筆；試算表多一列，編號是新的（例如 <code>B004</code>）</td></tr>
+    <tr><td>2</td><td>把那筆改成 17:00–18:00</td><td>表格和試算表的時間都變了</td></tr>
+    <tr><td>3</td><td>刪除那筆，確認視窗按「確定」</td><td>表格和試算表都不見了</td></tr>
+    <tr><td>4</td><td>在「九樓討論室」新增今天 09:30–10:30（和專案週會重疊）</td><td>「這個時段已經有人預約了」（<code>DATA-409</code>），試算表沒有多一列</td></tr>
+    <tr><td>5</td><td>新增一筆結束時間早於開始時間的預約</td><td>提示時間不正確（<code>DATA-422</code>），試算表沒有多一列</td></tr>
+  </table>
+</section>
+
+<section data-step data-min="2" data-title="這個階段學到什麼">
+  <h1>這個階段學到什麼</h1>
+  <div class="meta"></div>
+  <ul>
+    <li><strong>藏秘密</strong>：通行碼只在 BFF 的 <code>.env</code>，瀏覽器從頭到尾看不到。</li>
+    <li><strong>白名單</strong>：前端只能問 BFF 規定好的問題，不能指定要讀哪張工作表。</li>
+    <li><strong>整理資料</strong>：試算表的中文欄名，由 BFF 轉成前端好用的格式。</li>
+    <li><strong>統一錯誤</strong>：不管哪裡出錯，前端都收到同一種格式的錯誤代碼（例如 <code>DATA-409</code>）。</li>
+    <li><strong>業務規則放在 BFF</strong>：主旨長度、時間、衝突檢查都在 BFF 的 service。下一階段換成 ECP 時，這些規則都不用重寫。</li>
+  </ul>
+  <p>下一步：<a href="stage2.html">階段二：建立 ECP 單元</a>。</p>
 </section>
 
 <section data-step data-min="0" data-title="之後改了 Code.gs 怎麼辦">
@@ -227,6 +300,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <div class="meta"></div>
   <table>
     <tr><th>看到</th><th>原因</th></tr>
+    <tr><td>BFF 不肯啟動，列出缺少的設定</td><td><code>bff/.env</code> 沒建、檔名打錯，或少填一行</td></tr>
     <tr><td><code>DATA-503</code>、<code>source_auth_failed</code></td><td><code>.env</code> 的通行碼和指令碼屬性不一樣；或「誰可以存取」不是「所有人」</td></tr>
     <tr><td><code>DATA-503</code>、<code>source_unavailable</code></td><td>網址貼錯、網路不通，或 Google 暫時沒回應（稍等再試）</td></tr>
     <tr><td><code>DATA-502</code>、<code>source_bad_response</code></td><td>工作表名稱或第一列欄位名稱和範例不同；或改了 Code.gs 沒部署新版本</td></tr>
@@ -296,7 +370,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     prev.hidden = i === 0;
     next.hidden = i === sections.length - 1;
     mobileLabel.textContent = (i + 1) + ' / ' + sections.length + '　' + sections[i].dataset.title;
-    document.title = sections[i].dataset.title + '｜建立 Google Sheet 資料來源';
+    document.title = sections[i].dataset.title + '｜階段一：Sheet 版';
     window.scrollTo(0, 0);
   }
 
