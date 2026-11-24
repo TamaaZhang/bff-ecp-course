@@ -63,7 +63,9 @@ ol.steps > li { margin-bottom: 12px; }
 .path { font-weight: 600; color: var(--strong); }
 strong { color: var(--strong); font-weight: 600; }
 
-table { border-collapse: collapse; margin: 10px 0 16px; display: block; overflow-x: auto; max-width: 100%; }
+/* 表格撐滿卡片寬度；太寬時在外框裡左右捲動。 */
+.table-wrap { overflow-x: auto; margin: 10px 0 16px; }
+table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
 th { background: var(--code-bg); color: var(--strong); font-weight: 500; white-space: nowrap; }
 /* 欄位設定表：格子不換行，太寬就在表格內左右捲動。 */
@@ -334,6 +336,13 @@ a.btn:hover { text-decoration: none; }
   // 放在教學網站上才有首頁；學員直接打開檔案時不顯示首頁連結，「完成」也不顯示。
   const onSite = location.protocol === 'https:' || location.protocol === 'http:';
   document.getElementById('home').hidden = !onSite;
+
+  document.querySelectorAll('section[data-step] table').forEach(function (t) {
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    t.before(wrap);
+    wrap.append(t);
+  });
 
   // 選做的自我練習（data-optional）不算進總時間。
   const total = sections.reduce(function (sum, s) { return sum + minutes(s); }, 0);
