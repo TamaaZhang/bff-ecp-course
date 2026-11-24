@@ -58,6 +58,12 @@ table.fields th, table.fields td { white-space: nowrap; }
 .cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
 .cp.block code { padding: 0; background: none; word-break: break-all; }
 .cp.block button { flex: none; }
+.cp.block.pre code { display: block; flex: 1; min-width: 0; white-space: pre; word-break: normal; overflow: auto; max-height: 360px; }
+details { border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; margin: 10px 0; }
+details > summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details[open] > summary { margin-bottom: 8px; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.optional { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 10px; padding: 0 8px; vertical-align: middle; }
 a { color: var(--accent); }
 a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
 a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

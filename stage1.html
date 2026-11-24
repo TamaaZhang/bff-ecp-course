@@ -58,6 +58,12 @@ table.fields th, table.fields td { white-space: nowrap; }
 .cp.block { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; white-space: normal; background: var(--code-bg); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
 .cp.block code { padding: 0; background: none; word-break: break-all; }
 .cp.block button { flex: none; }
+.cp.block.pre code { display: block; flex: 1; min-width: 0; white-space: pre; word-break: normal; overflow: auto; max-height: 360px; }
+details { border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; margin: 10px 0; }
+details > summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details[open] > summary { margin-bottom: 8px; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.optional { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 10px; padding: 0 8px; vertical-align: middle; }
 a { color: var(--accent); }
 a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
 a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -110,14 +116,15 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <section data-step data-min="2" data-title="概覽">
   <h1>概覽</h1>
   <div class="meta"></div>
-  <p>這個階段用 Google 試算表當資料來源，做出一個會議室預約看板。分三段：</p>
+  <p>這個階段用 Google 試算表當資料來源，做出一個會議室預約看板。</p>
   <table>
     <tr><th>段落</th><th>做什麼</th><th>誰動手</th></tr>
-    <tr><td>準備（A～E）</td><td>建試算表、部署 Apps Script、產生通行碼、填 <code>bff/.env</code></td><td>你</td></tr>
-    <tr><td>1A 查詢</td><td>選日期、看那天的預約</td><td>AI 寫程式，你驗收</td></tr>
-    <tr><td>1B 新增、修改、刪除</td><td>在看板上新增、修改、刪除預約</td><td>AI 寫程式，你驗收</td></tr>
+    <tr><td>準備 A～D</td><td>複製試算表範本、產生通行碼、部署 Apps Script、填 <code>bff/.env</code></td><td>你</td></tr>
+    <tr><td>第一步：查詢</td><td>選日期、看那天的預約</td><td>AI 寫程式，你驗收</td></tr>
+    <tr><td>第二步：新增、修改、刪除</td><td>在看板上新增、修改、刪除預約</td><td>AI 寫程式，你驗收</td></tr>
+    <tr><td>自我練習 <span class="optional">選做</span></td><td>自己建試算表；不用指令，自己請 AI 做 BFF</td><td>你</td></tr>
   </table>
-  <p>1A、1B 分開做：先把查詢做好、驗收通過，再加上新增、修改、刪除。程式一次只多一點，比較看得懂，出錯也比較好找。</p>
+  <p>查詢和新增修改刪除分兩步做：先把查詢做好、驗收通過，再加上新增、修改、刪除。程式一次只多一點，比較看得懂，出錯也比較好找。</p>
   <h2>需要</h2>
   <ul>
     <li>一個 Google 帳號（個人 Gmail 最保險；公司或學校帳號可能被管理者關掉 Apps Script）</li>
@@ -126,43 +133,20 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </ul>
 </section>
 
-<section data-step data-min="5" data-title="A. 建立試算表">
-  <h1>A. 建立試算表</h1>
+<section data-step data-min="3" data-title="A. 複製試算表範本">
+  <h1>A. 複製試算表範本</h1>
   <div class="meta"></div>
-  <h2>方法 1（建議）：用講師的範本</h2>
   <ol class="steps">
     <li><a class="btn" href="https://docs.google.com/spreadsheets/d/1ewnKDc1AFazWhxQmTBU1NnVbiKHdaSWXEShDLY1Dj2U/copy" target="_blank" rel="noopener">打開範本並建立副本 ↗</a><br>
       按「建立副本」。範本已經含有資料和 Apps Script，副本會放在你自己的雲端硬碟。</li>
-    <li>接著做這一頁最下方的「兩種方法都要確認」，然後<strong>跳過 B</strong>，直接到 <strong>C. 產生通行碼</strong>。</li>
+    <li>確認 <span class="path">檔案 → 設定 → 時區</span> 是 <strong>(GMT+08:00) 台北</strong>。</li>
+    <li>確認「預約」的開始、結束時間顯示成日期時間（例如 <code>2026/11/24 9:00:00</code>）。如果顯示成小數，選取那兩欄，<span class="path">格式 → 數值 → 日期時間</span>。</li>
   </ol>
-  <h2>方法 2：自己建</h2>
-  <ol class="steps">
-    <li>打開 <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a> 建立空白試算表，命名為「會議室預約」。</li>
-    <li><span class="path">檔案 → 匯入 → 上傳</span>，選起始包 <code>sheet/</code> 資料夾裡的 <code>會議室.csv</code>，匯入位置選<strong>「插入新工作表」</strong>。</li>
-    <li>同樣方法匯入 <code>預約.csv</code>。</li>
-    <li>刪掉原本空白的「工作表1」。確認下方的工作表名稱剛好是 <span class="cp"><code>會議室</code></span> 和 <span class="cp"><code>預約</code></span>（一個字都不能差）。</li>
-  </ol>
-  <h2>兩種方法都要確認</h2>
-  <ul>
-    <li><span class="path">檔案 → 設定 → 時區</span> 是 <strong>(GMT+08:00) 台北</strong>。</li>
-    <li>「預約」的開始、結束時間顯示成日期時間（例如 <code>2026/11/24 9:00:00</code>）。如果顯示成小數，選取那兩欄，<span class="path">格式 → 數值 → 日期時間</span>。</li>
-  </ul>
-  <div class="note"><p>範例預約用了 <code>=TODAY()</code> 公式，所以每天打開都會是「今天」和「明天」的預約，方便練習。</p></div>
+  <div class="note"><p>範例預約用了 <code>=TODAY()</code> 公式，所以每天打開都會是「今天」和「明天」的預約，方便練習。想知道試算表和 Apps Script 是怎麼建出來的，可以做最後的「自我練習一」。</p></div>
 </section>
 
-<section data-step data-min="2" data-title="B. 貼上 Apps Script">
-  <h1>B. 貼上 Apps Script</h1>
-  <div class="meta"></div>
-  <div class="note"><p>用<strong>方法 1（範本）</strong>的人跳過這一步：範本已經有 Apps Script 了。</p></div>
-  <ol class="steps">
-    <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。</li>
-    <li>刪掉編輯器裡原本的內容，把起始包的 <code>sheet/Code.gs</code> 整份貼上，按儲存（磁碟片圖示）。</li>
-  </ol>
-  <p>這一份 <code>Code.gs</code> 已經包含 1A 查詢和 1B 新增、修改、刪除要用的功能，整個階段只要部署這一次。</p>
-</section>
-
-<section data-step data-min="3" data-title="C. 產生通行碼">
-  <h1>C. 產生通行碼</h1>
+<section data-step data-min="3" data-title="B. 產生通行碼">
+  <h1>B. 產生通行碼</h1>
   <div class="meta"></div>
   <p>通行碼是 BFF 和 Apps Script 之間的「暗號」：BFF 呼叫時要帶上，Apps Script 對了才回資料。</p>
   <ol class="steps">
@@ -170,7 +154,8 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="cp block"><code>node -e "console.log(crypto.randomUUID() + crypto.randomUUID())"</code></div>
       <div class="warn"><p>不要請 AI 幫你執行這行：AI 執行的指令，輸出會留在對話紀錄裡。</p></div>
     </li>
-    <li>在 Apps Script 左側按「專案設定」（齒輪）→ 最下方「指令碼屬性」→「新增指令碼屬性」：
+    <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。</li>
+    <li>Apps Script 左側按「專案設定」（齒輪）→ 最下方「指令碼屬性」→「新增指令碼屬性」：
       <table>
         <tr><th>屬性</th><td><span class="cp"><code>BFF_TOKEN</code></span></td></tr>
         <tr><th>值</th><td>剛剛那串通行碼</td></tr>
@@ -179,8 +164,8 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </ol>
 </section>
 
-<section data-step data-min="5" data-title="D. 部署成網頁 API">
-  <h1>D. 部署成網頁 API</h1>
+<section data-step data-min="5" data-title="C. 部署成網頁 API">
+  <h1>C. 部署成網頁 API</h1>
   <div class="meta"></div>
   <ol class="steps">
     <li>Apps Script 右上角 <span class="path">部署 → 新增部署作業</span>。</li>
@@ -193,8 +178,8 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <div class="note"><p>「所有人」的意思是：知道網址的人都能呼叫。所以才需要通行碼：沒有通行碼的呼叫，只會得到 <code>unauthorized</code>。</p></div>
 </section>
 
-<section data-step data-min="3" data-title="E. 填寫 bff/.env">
-  <h1>E. 填寫 <code>bff/.env</code></h1>
+<section data-step data-min="3" data-title="D. 填寫 bff/.env">
+  <h1>D. 填寫 <code>bff/.env</code></h1>
   <div class="meta"></div>
   <ol class="steps">
     <li>把起始包的 <code>bff/.env.example</code> 複製一份，改名為 <code>bff/.env</code>（同一個資料夾）。</li>
@@ -216,25 +201,25 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </table>
 </section>
 
-<section data-step data-min="15" data-title="1A 查詢：請 AI 寫程式">
-  <h1>1A 查詢：請 AI 寫程式</h1>
+<section data-step data-min="15" data-title="第一步：請 AI 做查詢">
+  <h1>第一步：請 AI 做查詢</h1>
   <div class="meta"></div>
   <p>做出來的樣子：在網頁選一個日期、按「查詢」，看到那天所有會議室預約，依開始時間排序。</p>
   <ol class="steps">
     <li>用 Claude Code 打開起始包資料夾（桌面 App 的 Code 分頁 → 選擇這個資料夾）。</li>
     <li>輸入：<span class="cp"><code>/bff-sheet-query</code></span><br>
-      Codex 使用者：把起始包 <code>提示詞/1A_查詢.md</code> 的內容整份貼上。</li>
-    <li>AI 會先問你三件事：A～E 做完了嗎、試算表有今天的預約嗎、Node 版本對嗎。都是就回答「是」。</li>
+      Codex 使用者：把起始包 <code>提示詞/1_查詢.md</code> 的內容整份貼上。</li>
+    <li>AI 會先問你三件事：準備 A～D 做完了嗎、試算表有今天的預約嗎、Node 版本對嗎。都是就回答「是」。</li>
     <li>AI 開始寫程式（時間依電腦和 AI 速度而定）。它每寫完一個檔案會說明那個檔案負責什麼，邊看邊問沒關係。</li>
     <li>AI 寫完會告訴你下一步：在 <code>bff</code> 資料夾執行 <code>npm start</code>，打開 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>。</li>
   </ol>
   <div class="warn"><p>AI 如果要你把通行碼貼到對話裡，<strong>不要貼</strong>。通行碼只放在 <code>bff/.env</code>。</p></div>
 </section>
 
-<section data-step data-min="10" data-title="1A 驗收">
-  <h1>1A 驗收</h1>
+<section data-step data-min="10" data-title="驗收：查詢">
+  <h1>驗收：查詢</h1>
   <div class="meta"></div>
-  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「1A」（Codex：貼上 <code>提示詞/驗收.md</code>）。AI 會一次給你一個動作，你自己操作、回報結果，再把結果寫進起始包的 <code>驗收檢核表/1A_查詢.md</code>。</p>
+  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「查詢」（Codex：貼上 <code>提示詞/驗收.md</code>）。AI 會一次給你一個動作，你自己操作、回報結果，再把結果寫進起始包的 <code>驗收檢核表/1_查詢.md</code>。</p>
   <h2>你會做的 5 件事</h2>
   <table>
     <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
@@ -246,24 +231,24 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </table>
 </section>
 
-<section data-step data-min="15" data-title="1B 新增、修改、刪除：請 AI 寫程式">
-  <h1>1B 新增、修改、刪除：請 AI 寫程式</h1>
+<section data-step data-min="15" data-title="第二步：請 AI 做新增、修改、刪除">
+  <h1>第二步：請 AI 做新增、修改、刪除</h1>
   <div class="meta"></div>
   <p>做出來的樣子：看板上方多一個「新增預約」表單；每一筆預約多「修改」「刪除」按鈕；時段和同一間會議室的其他預約重疊時，會擋下來。</p>
   <ol class="steps">
     <li>先停掉 BFF（在跑 <code>npm start</code> 的終端機按 Ctrl+C）。</li>
     <li>在 Claude Code 輸入：<span class="cp"><code>/bff-sheet-crud</code></span><br>
-      Codex 使用者：貼上 <code>提示詞/1B_增刪改.md</code>。</li>
-    <li>AI 會先確認：1A 驗收通過了嗎、Apps Script 是起始包那份 <code>Code.gs</code> 嗎。照 A～D 做的話都是「是」。</li>
-    <li>AI 會沿用 1A 的程式，只加新的部分。寫完後重新 <code>npm start</code>，打開網頁。</li>
+      Codex 使用者：貼上 <code>提示詞/2_增刪改.md</code>。</li>
+    <li>AI 會先確認：查詢驗收通過了嗎、Apps Script 是起始包那份 <code>Code.gs</code> 嗎。用範本的話都是「是」。</li>
+    <li>AI 會沿用查詢的程式，只加新的部分。寫完後重新 <code>npm start</code>，打開網頁。</li>
   </ol>
   <div class="note"><p>每次新增要經過 Google 三次（查會議室、查同一天的預約、寫入），大約要等幾秒。送出時按鈕會先停用，避免連按送出兩次。</p></div>
 </section>
 
-<section data-step data-min="10" data-title="1B 驗收">
-  <h1>1B 驗收</h1>
+<section data-step data-min="10" data-title="驗收：新增、修改、刪除">
+  <h1>驗收：新增、修改、刪除</h1>
   <div class="meta"></div>
-  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「1B」，結果寫進 <code>驗收檢核表/1B_增刪改.md</code>。每一項都<strong>同時看網頁和試算表</strong>。</p>
+  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「新增修改刪除」，結果寫進 <code>驗收檢核表/2_增刪改.md</code>。每一項都<strong>同時看網頁和試算表</strong>。</p>
   <h2>你會做的 5 件事</h2>
   <table>
     <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
@@ -285,14 +270,7 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <li><strong>統一錯誤</strong>：不管哪裡出錯，前端都收到同一種格式的錯誤代碼（例如 <code>DATA-409</code>）。</li>
     <li><strong>業務規則放在 BFF</strong>：主旨長度、時間、衝突檢查都在 BFF 的 service。下一階段換成 ECP 時，這些規則都不用重寫。</li>
   </ul>
-  <p>下一步：<a href="stage2.html">階段二：建立 ECP 單元</a>。</p>
-</section>
-
-<section data-step data-min="0" data-title="之後改了 Code.gs 怎麼辦">
-  <h1>之後改了 Code.gs 怎麼辦</h1>
-  <div class="meta"></div>
-  <p>改完儲存後，要 <span class="path">部署 → 管理部署作業 → 編輯（鉛筆）→ 版本：新版本 → 部署</span>。</p>
-  <p>不這樣做的話，網址背後跑的還是舊版程式。網址不會變，<code>.env</code> 不用改。</p>
+  <p>下一步：<a href="stage2.html">階段二：建立 ECP 單元</a>。想多練習的話，先做下面兩個自我練習。</p>
 </section>
 
 <section data-step data-min="0" data-title="常見問題">
@@ -306,6 +284,310 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <tr><td><code>DATA-502</code>、<code>source_bad_response</code></td><td>工作表名稱或第一列欄位名稱和範例不同；或改了 Code.gs 沒部署新版本</td></tr>
     <tr><td>查得到會議室，預約卻是空的</td><td>試算表時區不是台北，或時間欄是文字不是日期時間</td></tr>
   </table>
+  <h2>改了 Apps Script 之後</h2>
+  <p>改完儲存後，要 <span class="path">部署 → 管理部署作業 → 編輯（鉛筆）→ 版本：新版本 → 部署</span>。不這樣做的話，網址背後跑的還是舊版程式。網址不會變，<code>.env</code> 不用改。</p>
+</section>
+
+<section data-step data-min="20" data-title="自我練習一：自己建試算表">
+  <h1>自我練習一：自己建試算表 <span class="optional">選做</span></h1>
+  <div class="meta"></div>
+  <p>範本是怎麼做出來的？這個練習從空白試算表開始，自己匯入資料、貼上 Apps Script，再部署一次。</p>
+  <ol class="steps">
+    <li>打開 <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a> 建立空白試算表，命名為「會議室預約（練習）」。</li>
+    <li><span class="path">檔案 → 匯入 → 上傳</span>，選起始包 <code>sheet/</code> 資料夾裡的 <code>會議室.csv</code>，匯入位置選<strong>「插入新工作表」</strong>。</li>
+    <li>同樣方法匯入 <code>預約.csv</code>。</li>
+    <li>刪掉原本空白的「工作表1」。確認下方的工作表名稱剛好是 <span class="cp"><code>會議室</code></span> 和 <span class="cp"><code>預約</code></span>（一個字都不能差）。</li>
+    <li>時區設成台北、「預約」的時間欄設成日期時間（和準備 A 一樣）。</li>
+    <li><span class="path">擴充功能 → Apps Script</span>，刪掉編輯器裡原本的內容，把下面的程式整份貼上，按儲存（磁碟片圖示）：
+      <div class="cp block pre"><code>// 會議室預約看板：給 BFF 呼叫的 API（講師提供，貼到 Apps Script 即可，整門課只要部署這一版）。
+// 只開放固定的幾個動作、只碰兩張工作表，而且要帶對通行碼才會動作。
+// 查詢只用到 rooms、bookings；新增、修改、刪除才用到 createBooking、updateBooking、deleteBooking。
+
+// 白名單：BFF 只能碰這兩張工作表，其他工作表（例如「員工」）一律碰不到。
+const SHEETS = { rooms: '會議室', bookings: '預約' };
+// 預約工作表的欄位順序（第一列的欄名要一模一樣）。
+const BOOKING_HEADERS = ['編號', '主旨', '會議室編號', '開始時間', '結束時間'];
+// 一次最多回傳的預約筆數，超過就標示 truncated: true。
+const MAX_ROWS = 100;
+// 日期時間格式：2026-11-24 09:00
+const DATETIME = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
+
+// BFF 用 POST 呼叫。通行碼放在本文（不放網址），因為網址容易被記錄下來。
+function doPost(e) {
+  try {
+    const body = JSON.parse((e &amp;&amp; e.postData &amp;&amp; e.postData.contents) || '{}');
+
+    const token = PropertiesService.getScriptProperties().getProperty('BFF_TOKEN');
+    if (!token) return reply_({ ok: false, code: 'token_not_set' });
+    if (typeof body.token !== 'string' || body.token !== token) {
+      return reply_({ ok: false, code: 'unauthorized' });
+    }
+
+    switch (body.action) {
+      case 'rooms':
+        return reply_({ ok: true, data: { records: readSheet_(SHEETS.rooms), truncated: false } });
+      case 'bookings':
+        return listBookings_(body);
+      case 'createBooking':
+      case 'updateBooking':
+      case 'deleteBooking':
+        return withLock_(function () { return WRITERS[body.action](body); });
+      default:
+        return reply_({ ok: false, code: 'unknown_action' });
+    }
+  } catch (err) {
+    // 詳細原因只留在 Apps Script 的「執行作業」紀錄，不回給呼叫的人。
+    console.error(err);
+    return reply_({ ok: false, code: 'script_error' });
+  }
+}
+
+// ---------- 查詢 ----------
+
+function listBookings_(body) {
+  if (!DATETIME.test(String(body.from)) || !DATETIME.test(String(body.to))) {
+    return reply_({ ok: false, code: 'invalid_range' });
+  }
+  const all = readSheet_(SHEETS.bookings);
+  // 開始時間不是日期時間的列（打錯字、公式錯誤）直接回報是第幾列，不要默默略過。
+  for (let i = 0; i &lt; all.length; i++) {
+    if (!DATETIME.test(all[i]['開始時間'])) {
+      return reply_({ ok: false, code: 'invalid_data', sheet: SHEETS.bookings, row: i + 2 });
+    }
+  }
+  // 這個格式的文字可以直接比大小（"2026-11-24 09:00" &lt; "2026-11-24 10:00"）。
+  const records = all.filter(function (r) {
+    return r['開始時間'] &gt;= body.from &amp;&amp; r['開始時間'] &lt;= body.to;
+  });
+  return reply_({
+    ok: true,
+    data: { records: records.slice(0, MAX_ROWS), truncated: records.length &gt; MAX_ROWS },
+  });
+}
+
+// ---------- 新增、修改、刪除 ----------
+// 業務規則（主旨長度、時段衝突）由 BFF 檢查；這裡只做「資料能不能安全寫進去」的基本檢查。
+
+const WRITERS = {
+  createBooking: function (body) {
+    const input = checkInput_(body);
+    if (input.error) return reply_({ ok: false, code: input.error });
+    const sheet = bookingSheet_();
+    const id = nextId_(sheet);
+    sheet.appendRow([id, input.topic, input.roomId, input.start, input.end]);
+    return reply_({ ok: true, data: { record: findById_(sheet, id).record } });
+  },
+
+  updateBooking: function (body) {
+    const input = checkInput_(body);
+    if (input.error) return reply_({ ok: false, code: input.error });
+    const sheet = bookingSheet_();
+    const found = findById_(sheet, body.id);
+    if (!found) return reply_({ ok: false, code: 'not_found' });
+    sheet.getRange(found.row, 2, 1, 4).setValues([[input.topic, input.roomId, input.start, input.end]]);
+    return reply_({ ok: true, data: { record: findById_(sheet, body.id).record } });
+  },
+
+  deleteBooking: function (body) {
+    const sheet = bookingSheet_();
+    const found = findById_(sheet, body.id);
+    if (!found) return reply_({ ok: false, code: 'not_found' });
+    sheet.deleteRow(found.row);
+    return reply_({ ok: true, data: { id: String(body.id) } });
+  },
+};
+
+// 同一時間只讓一個寫入進行，避免兩個請求同時改到同一列、或拿到同一個編號。
+function withLock_(fn) {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return reply_({ ok: false, code: 'busy' });
+  try {
+    return fn();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 檢查寫入的值，並把時間文字轉成試算表的日期時間（用試算表的時區）。
+function checkInput_(body) {
+  const topic = typeof body.topic === 'string' ? body.topic.trim() : '';
+  const roomId = typeof body.roomId === 'string' ? body.roomId.trim() : '';
+  if (!topic || topic.length &gt; 100) return { error: 'invalid_input' };
+  if (!DATETIME.test(String(body.startsAt)) || !DATETIME.test(String(body.endsAt))) return { error: 'invalid_input' };
+  if (!(body.endsAt &gt; body.startsAt)) return { error: 'invalid_input' };
+  const roomIds = readSheet_(SHEETS.rooms).map(function (r) { return r['編號']; });
+  if (roomIds.indexOf(roomId) === -1) return { error: 'room_not_found' };
+  // 開頭是 = + - @ 的文字會被試算表當成公式，前面加一個 ' 讓它保持純文字。
+  const safeTopic = /^[=+\-@]/.test(topic) ? "'" + topic : topic;
+  const timeZone = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+  return {
+    topic: safeTopic,
+    roomId: roomId,
+    start: Utilities.parseDate(body.startsAt, timeZone, 'yyyy-MM-dd HH:mm'),
+    end: Utilities.parseDate(body.endsAt, timeZone, 'yyyy-MM-dd HH:mm'),
+  };
+}
+
+function bookingSheet_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEETS.bookings);
+  if (!sheet) throw new Error('找不到工作表：' + SHEETS.bookings);
+  const headers = sheet.getRange(1, 1, 1, BOOKING_HEADERS.length).getValues()[0].map(function (h) { return String(h).trim(); });
+  if (headers.join() !== BOOKING_HEADERS.join()) throw new Error('預約工作表第一列的欄名和規定不同');
+  return sheet;
+}
+
+// 新編號：B 加三位數，取目前最大的編號再加一（B003 → B004）。
+function nextId_(sheet) {
+  const ids = readSheet_(SHEETS.bookings).map(function (r) { return r['編號']; });
+  let max = 0;
+  ids.forEach(function (id) {
+    const m = /^B(\d+)$/.exec(id);
+    if (m) max = Math.max(max, Number(m[1]));
+  });
+  return 'B' + String(max + 1).padStart(3, '0');
+}
+
+// 用編號找預約：回傳它在第幾列（含標題列）和整理好的資料；找不到回傳 null。
+function findById_(sheet, id) {
+  if (typeof id !== 'string' || !id) return null;
+  // 直接看 A 欄每一列（不能用 readSheet_ 的順序算列號，因為它會略過空白列）。
+  const ids = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
+  for (let i = 1; i &lt; ids.length; i++) {
+    if (String(ids[i][0]).trim() === id) {
+      const record = readSheet_(SHEETS.bookings).filter(function (r) { return r['編號'] === id; })[0];
+      return { row: i + 1, record: record };
+    }
+  }
+  return null;
+}
+
+// ---------- 共用 ----------
+
+// 讀一張工作表：第一列是欄位名稱，之後每一列變成一筆 { 欄位名稱: 值 }。
+function readSheet_(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(name);
+  if (!sheet) throw new Error('找不到工作表：' + name);
+
+  const timeZone = ss.getSpreadsheetTimeZone();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(function (h) { return String(h).trim(); });
+
+  return values.slice(1)
+    .filter(function (row) { return row.some(function (v) { return v !== ''; }); }) // 跳過空白列
+    .map(function (row) {
+      const record = {};
+      headers.forEach(function (h, i) {
+        const v = row[i];
+        // 試算表的日期時間是 Date 物件，統一轉成 "YYYY-MM-DD HH:mm" 文字。
+        // 不用 instanceof Date：試算表傳回的日期物件不一定判斷得出來，這個寫法比較可靠。
+        const isDate = Object.prototype.toString.call(v) === '[object Date]';
+        record[h] = isDate ? Utilities.formatDate(v, timeZone, 'yyyy-MM-dd HH:mm') : String(v).trim();
+      });
+      return record;
+    });
+}
+
+function reply_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}</code></div>
+    </li>
+    <li>照準備 B、C 設定通行碼、部署。通行碼可以沿用原本那串。</li>
+    <li>把 <code>bff/.env</code> 的 <code>SHEET_API_URL=</code> 換成這份的 <code>/exec</code> 網址，重新 <code>npm start</code>，看板會改讀這份試算表。</li>
+  </ol>
+  <h2>想一想</h2>
+  <ul>
+    <li><code>預約.csv</code> 裡的 <code>=TODAY()+TIME(9,0,0)</code> 是什麼意思？為什麼範例每天打開都是「今天」？</li>
+    <li>Apps Script 開頭的 <code>SHEETS</code> 只列了兩張工作表。如果試算表多一張「員工」，BFF 讀得到嗎？</li>
+    <li>為什麼通行碼放在「指令碼屬性」，而不是直接寫在程式裡？</li>
+  </ul>
+</section>
+
+<section data-step data-min="60" data-title="自我練習二：不用指令，自己做 BFF">
+  <h1>自我練習二：不用指令，自己做 BFF <span class="optional">選做</span></h1>
+  <div class="meta"></div>
+  <p>前面是用 <code>/bff-sheet-query</code> 這類指令，AI 照講師寫好的規範做事。這個練習<strong>不用指令、不給規範</strong>，你用自己的話告訴 AI 要做什麼。做完再和課堂版比一比：哪些事情你沒講，AI 就沒做？</p>
+
+  <h2>1. 準備一個空資料夾</h2>
+  <ol class="steps">
+    <li>建一個新資料夾，例如 <code>my-bff</code>（不要放在起始包裡面，也不要複製 <code>AGENTS.md</code> 和 <code>.claude/</code>）。</li>
+    <li>在 <code>my-bff</code> 裡建 <code>.claude/settings.json</code>，內容如下。這會禁止 Claude Code 讀取或修改 <code>.env</code>，先把秘密保護好：
+      <div class="cp block"><code>{ "permissions": { "deny": ["Read(**/.env)", "Edit(**/.env)"] } }</code></div>
+      Codex 沒有這個設定，用 Codex 的人要在提示詞裡明講「不要讀取 .env」。</li>
+    <li>把起始包的 <code>bff/.env</code> 複製到 <code>my-bff/.env</code>。</li>
+    <li>用 Claude Code 打開 <code>my-bff</code>。</li>
+  </ol>
+
+  <h2>2. 分幾次跟 AI 說</h2>
+  <p>一次講完 AI 容易漏東西。建議照下面的順序，一次講一件事，每次做完先試試看。每一段都先自己寫寫看，卡住再打開參考提示詞。</p>
+
+  <h3>① 說清楚要做什麼</h3>
+  <p>要講到：做什麼看板、使用者怎麼操作、架構（瀏覽器 → BFF → Apps Script）、用什麼技術。</p>
+  <details><summary>參考提示詞</summary>
+    <div class="cp block pre"><code>我要做一個「會議室預約看板」：使用者在網頁選一個日期，看到那天所有會議室的預約（時間、會議室、主旨），依開始時間排序。
+
+架構：瀏覽器 → BFF → Google Apps Script（資料在 Google 試算表）。
+- 瀏覽器只呼叫 BFF，不直接呼叫 Apps Script。
+- BFF 用 Node.js + Express，對前端提供 GraphQL（POST /graphql）。
+- 前端用純 HTML、CSS、JavaScript，由 BFF 一起提供。
+
+先不要寫程式，先告訴我你打算建哪些檔案、各負責什麼。</code></div>
+  </details>
+
+  <h3>② 告訴 AI 資料來源長什麼樣子</h3>
+  <p>AI 不知道你的 Apps Script 怎麼呼叫。把下面這些<strong>公開資訊</strong>告訴它（網址和通行碼不用給，叫它從 <code>.env</code> 讀）。</p>
+  <details><summary>參考提示詞</summary>
+    <div class="cp block pre"><code>資料來源是 Google Apps Script 網頁 API：
+- 網址和通行碼在 .env 的 SHEET_API_URL、SHEET_API_TOKEN。不要讀 .env，用 process.env 取得。
+- 呼叫方式：POST 網址，Content-Type: application/json，通行碼放在本文的 token（不要放網址）。
+- 查會議室：{ "token": "...", "action": "rooms" }
+- 查預約：{ "token": "...", "action": "bookings", "from": "2026-11-24 00:00", "to": "2026-11-24 23:59" }
+- 成功回應：{ "ok": true, "data": { "records": [ { 欄位名稱: 值 } ], "truncated": false } }
+- 失敗回應：{ "ok": false, "code": "unauthorized" }
+- 會議室欄位：編號、名稱、地點、樓層。預約欄位：編號、主旨、會議室編號、開始時間、結束時間。
+- 時間格式是 "YYYY-MM-DD HH:mm"。
+
+請 BFF 把中文欄位轉成英文名稱，預約要帶出會議室的名稱、地點、樓層。</code></div>
+  </details>
+
+  <h3>③ 說出安全要求</h3>
+  <p>這是最容易忘的一段。想想看：通行碼放哪裡？前端能不能指定要讀哪張工作表？出錯時要給前端看什麼？</p>
+  <details><summary>參考提示詞</summary>
+    <div class="cp block pre"><code>請遵守這些安全要求：
+1. 通行碼只從環境變數讀，不能出現在程式、前端、網址、log、錯誤訊息裡。
+2. 設定缺少或格式不對時，BFF 拒絕啟動，用中文說明要補什麼（不要印出秘密的值）。
+3. 前端不能指定要讀哪張工作表或哪個動作，BFF 只提供固定的查詢。
+4. 檢查前端送來的日期格式，不對就回錯誤，不要呼叫 Apps Script。
+5. 錯誤統一回傳 { code, requestId }，不要把 Apps Script 的原始錯誤或堆疊送給前端。
+6. 前端顯示資料用 textContent，不要用 innerHTML。
+7. 前端送 GraphQL 時，使用者輸入放在 variables，不要拼進查詢字串。
+8. 不要用假資料，連不到就回錯誤。</code></div>
+  </details>
+
+  <h3>④ 請 AI 說明和測試</h3>
+  <details><summary>參考提示詞</summary>
+    <div class="cp block pre"><code>寫完後：
+1. 用 node:test 寫幾個不需要連網路的測試（例如日期檢查、欄位轉換），並執行給我看結果。
+2. 用條列告訴我每個檔案負責什麼。
+3. 告訴我怎麼啟動、打開哪個網址。</code></div>
+  </details>
+
+  <h2>3. 自己檢查</h2>
+  <table>
+    <tr><th>#</th><th>怎麼檢查</th><th>應該是</th></tr>
+    <tr><td>1</td><td>打開看板查今天</td><td>看得到預約，依時間排序</td></tr>
+    <tr><td>2</td><td>F12 → Network，看瀏覽器送出的請求</td><td>只呼叫 <code>/graphql</code>，找不到通行碼和 Apps Script 網址</td></tr>
+    <tr><td>3</td><td>把 <code>.env</code> 改名，再啟動 BFF</td><td>拒絕啟動，中文說明缺什麼（記得改回來）</td></tr>
+    <tr><td>4</td><td>查一個錯的日期（例如 <code>2026-13-01</code>）</td><td>回錯誤代碼，沒有原始錯誤或堆疊</td></tr>
+    <tr><td>5</td><td>在專案裡搜尋 <code>innerHTML</code> 和你的通行碼開頭幾個字</td><td>都找不到</td></tr>
+  </table>
+
+  <h2>想一想</h2>
+  <ul>
+    <li>你的版本和課堂版（起始包的 <code>AGENTS.md</code>）比，少了哪些規則？</li>
+    <li>如果第 ③ 段完全不講，AI 做出來的會有哪些問題？</li>
+    <li>做得順的話，用同樣的方法請 AI 加上新增、修改、刪除，記得講清楚衝突檢查的規則。</li>
+  </ul>
 </section>
 
     <div class="pager">
