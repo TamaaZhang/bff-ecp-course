@@ -293,8 +293,10 @@ a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   // 放在教學網站上才有首頁；學員直接打開檔案時不顯示這個連結。
   if (location.protocol === 'https:' || location.protocol === 'http:') document.getElementById('home').hidden = false;
 
-  const total = sections.reduce(function (sum, s) { return sum + Number(s.dataset.min); }, 0);
-  document.getElementById('total').textContent = '預計 ' + total + ' 分鐘';
+  // 選做的自我練習（data-optional）不算進總時間。
+  const total = sections.reduce(function (sum, s) { return s.hasAttribute('data-optional') ? sum : sum + Number(s.dataset.min); }, 0);
+  const hasOptional = sections.some(function (s) { return s.hasAttribute('data-optional'); });
+  document.getElementById('total').textContent = '預計 ' + total + ' 分鐘' + (hasOptional ? '（不含自我練習）' : '');
 
   const buttons = sections.map(function (s, i) {
     const min = Number(s.dataset.min);
