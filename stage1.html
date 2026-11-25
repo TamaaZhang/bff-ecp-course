@@ -92,6 +92,10 @@ code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--
 .warn { background: var(--warn-bg); border-color: var(--warn-line); }
 .note > :first-child, .warn > :first-child { margin-top: 0; }
 .note > :last-child, .warn > :last-child { margin-bottom: 0; }
+/* 步驟截圖：紅框是要按或要填的地方，點圖片開原尺寸。 */
+figure.shot { margin: 10px 0 14px; }
+figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid #dadce0; border-radius: 4px; }
+figure.shot figcaption { margin-top: 4px; font-size: 13px; color: #5f6368; }
 
 details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
 details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
@@ -187,8 +191,11 @@ a.btn:hover { text-decoration: none; }
   <div class="meta"></div>
   <ol class="steps">
     <li><a class="btn" href="https://docs.google.com/spreadsheets/d/1ewnKDc1AFazWhxQmTBU1NnVbiKHdaSWXEShDLY1Dj2U/copy" target="_blank" rel="noopener">打開範本並建立副本 ↗</a><br>
-      按「建立副本」。範本已經含有資料和 Apps Script，副本會放在你自己的雲端硬碟。</li>
-    <li>確認 <span class="path">檔案 → 設定 → 時區</span> 是 <strong>(GMT+08:00) 台北</strong>。</li>
+      按「建立副本」。範本已經含有資料和 Apps Script，副本會放在你自己的雲端硬碟。
+      <figure class="shot"><a href="img/stage1/a1.jpg" target="_blank" rel="noopener"><img src="img/stage1/a1.jpg" alt="複製文件頁面，紅框標出「建立副本」按鈕" loading="lazy" width="800"></a></figure></li>
+    <li>確認 <span class="path">檔案 → 設定 → 時區</span> 是 <strong>(GMT+08:00) 台北</strong>。
+      <figure class="shot"><a href="img/stage1/a3.jpg" target="_blank" rel="noopener"><img src="img/stage1/a3.jpg" alt="檔案選單，紅框標出最下方的「設定」" loading="lazy" width="800"></a></figure>
+      <figure class="shot"><a href="img/stage1/a4.jpg" target="_blank" rel="noopener"><img src="img/stage1/a4.jpg" alt="試算表設定視窗，紅框標出時區 (GMT+08:00) 台北" loading="lazy" width="800"></a></figure></li>
     <li>確認「預約」的開始、結束時間顯示成日期時間（例如 <code>2026/11/24 9:00:00</code>）。如果顯示成小數，選取那兩欄，<span class="path">格式 → 數值 → 日期時間</span>。</li>
   </ol>
   <div class="note"><p>範例預約用了 <code>=TODAY()</code> 公式，所以每天打開都會是「今天」和「明天」的預約，方便練習。想知道試算表和 Apps Script 是怎麼建出來的，可以做最後的「自我練習一」。</p></div>
@@ -203,13 +210,16 @@ a.btn:hover { text-decoration: none; }
       <div class="cp block"><code>node -e "console.log(crypto.randomUUID() + crypto.randomUUID())"</code></div>
       <div class="warn"><p>不要請 AI 幫你執行這行：AI 執行的指令，輸出會留在對話紀錄裡。</p></div>
     </li>
-    <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。</li>
+    <li>在試算表選 <span class="path">擴充功能 → Apps Script</span>。
+      <figure class="shot"><a href="img/stage1/b1.jpg" target="_blank" rel="noopener"><img src="img/stage1/b1.jpg" alt="擴充功能選單，紅框標出 Apps Script" loading="lazy" width="800"></a></figure></li>
     <li>Apps Script 左側按「專案設定」（齒輪）→ 最下方「指令碼屬性」→「新增指令碼屬性」：
+      <figure class="shot"><a href="img/stage1/b2.jpg" target="_blank" rel="noopener"><img src="img/stage1/b2.jpg" alt="Apps Script 左側選單，紅框標出「專案設定」" loading="lazy" width="800"></a></figure>
       <table>
         <tr><th>屬性</th><td><span class="cp"><code>BFF_TOKEN</code></span></td></tr>
         <tr><th>值</th><td>剛剛那串通行碼</td></tr>
       </table>
-      按「儲存指令碼屬性」。</li>
+      按「儲存指令碼屬性」。
+      <figure class="shot"><a href="img/stage1/b3.jpg" target="_blank" rel="noopener"><img src="img/stage1/b3.jpg" alt="指令碼屬性，紅框標出屬性 BFF_TOKEN、值的欄位和「儲存指令碼屬性」按鈕" loading="lazy" width="800"></a><figcaption>圖中的值只是示意，請貼你自己的通行碼。</figcaption></figure></li>
   </ol>
 </section>
 
@@ -217,10 +227,14 @@ a.btn:hover { text-decoration: none; }
   <h1>C. 部署成網頁 API</h1>
   <div class="meta"></div>
   <ol class="steps">
-    <li>Apps Script 右上角 <span class="path">部署 → 新增部署作業</span>。</li>
+    <li>Apps Script 右上角 <span class="path">部署 → 新增部署作業</span>。
+      <figure class="shot"><a href="img/stage1/c1.jpg" target="_blank" rel="noopener"><img src="img/stage1/c1.jpg" alt="部署選單，紅框標出「新增部署作業」" loading="lazy" width="800"></a></figure></li>
     <li>左邊齒輪選「網頁應用程式」。</li>
-    <li>執行身分：<strong>我</strong>；誰可以存取：<strong>所有人</strong>。</li>
-    <li>按「部署」。第一次會要求授權：選你的帳號 → 看到「Google 尚未驗證這個應用程式」時按「進階」→「前往（不安全）」→「允許」。<br>
+    <li>執行身分：<strong>我</strong>；誰可以存取：<strong>所有人</strong>。
+      <figure class="shot"><a href="img/stage1/c2.jpg" target="_blank" rel="noopener"><img src="img/stage1/c2.jpg" alt="新增部署作業視窗，紅框標出網頁應用程式、執行身分「我」、誰可以存取「所有人」" loading="lazy" width="800"></a><figcaption>「我」後面會顯示你的 Gmail，圖中已遮住。</figcaption></figure></li>
+    <li>按「部署」。第一次會要求授權，先按「授予存取權」：
+      <figure class="shot"><a href="img/stage1/c3.jpg" target="_blank" rel="noopener"><img src="img/stage1/c3.jpg" alt="新增部署作業視窗，紅框標出「授予存取權」按鈕" loading="lazy" width="800"></a></figure>
+      然後選你的帳號 → 看到「Google 尚未驗證這個應用程式」時按「進階」→「前往（不安全）」→「允許」。<br>
       這是因為這支程式是你自己的，還沒送 Google 審核；它只會讀寫你這份試算表的「會議室」「預約」兩張工作表。</li>
     <li>複製「網頁應用程式」網址（結尾是 <code>/exec</code>）。</li>
   </ol>

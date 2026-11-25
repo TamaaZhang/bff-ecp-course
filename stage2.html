@@ -92,6 +92,10 @@ code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--
 .warn { background: var(--warn-bg); border-color: var(--warn-line); }
 .note > :first-child, .warn > :first-child { margin-top: 0; }
 .note > :last-child, .warn > :last-child { margin-bottom: 0; }
+/* 步驟截圖：紅框是要按或要填的地方，點圖片開原尺寸。 */
+figure.shot { margin: 10px 0 14px; }
+figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid #dadce0; border-radius: 4px; }
+figure.shot figcaption { margin-top: 4px; font-size: 13px; color: #5f6368; }
 
 details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
 details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
@@ -201,16 +205,19 @@ a.btn:hover { text-decoration: none; }
   <div class="meta"></div>
   <p>字典就是下拉選單的選項：資料庫存英文代碼，畫面顯示中文。</p>
   <ol class="steps">
-    <li>左側選單 <span class="path">系統管理 → 基礎設定 → 其他 → 字典設定</span>。</li>
-    <li>按「新增」，名稱填 <span class="cp"><code>會議室地點</code></span>，儲存。</li>
-    <li>在這個字典新增兩個字典項：
+    <li>左側選單 <span class="path">系統管理 → 基礎設定 → 其它 → 字典設定</span>。
+      <figure class="shot"><a href="img/stage2/d1.jpg" target="_blank" rel="noopener"><img src="img/stage2/d1.jpg" alt="系統管理的基礎設定選單，紅框標出「其它」底下的「字典設定」" loading="lazy" width="800"></a></figure></li>
+    <li>按「新增」，名稱填 <span class="cp"><code>會議室地點</code></span>，按「保存」。
+      <figure class="shot"><a href="img/stage2/d3.jpg" target="_blank" rel="noopener"><img src="img/stage2/d3.jpg" alt="字典新增視窗，紅框標出名稱「會議室地點」和「保存」按鈕" loading="lazy" width="800"></a></figure></li>
+    <li>左側點「字典項」，按「新增」兩次，填兩個字典項：
       <table>
         <tr><th>值（存進資料庫）</th><th>顯示文字</th></tr>
         <tr><td><span class="cp"><code>Taipei</code></span></td><td>台北</td></tr>
         <tr><td><span class="cp"><code>OtherSite</code></span></td><td>其他據點</td></tr>
       </table>
+      <figure class="shot"><a href="img/stage2/d4.jpg" target="_blank" rel="noopener"><img src="img/stage2/d4.jpg" alt="字典項清單，紅框標出左側「字典項」、「新增」按鈕和兩筆字典項" loading="lazy" width="800"></a></figure>
     </li>
-    <li>儲存。</li>
+    <li>按「保存」。</li>
   </ol>
 </section>
 
@@ -218,7 +225,8 @@ a.btn:hover { text-decoration: none; }
   <h1>建單元「會議室」</h1>
   <div class="meta"></div>
   <ol class="steps">
-    <li><span class="path">系統管理 → 進階設定 → 單元設定</span>，按「新增」。</li>
+    <li><span class="path">系統管理 → 進階設定 → 單元設定</span>，按「新增」旁的箭頭，選<strong>實體單元（基於關聯式資料庫）</strong>。
+      <figure class="shot"><a href="img/stage2/u2.jpg" target="_blank" rel="noopener"><img src="img/stage2/u2.jpg" alt="單元設定清單，紅框標出「新增」和選單裡的「實體單元（基於關聯式資料庫）」" loading="lazy" width="800"></a></figure></li>
     <li>基本資料：
       <table>
         <tr><th>項目</th><th>值</th></tr>
@@ -228,16 +236,28 @@ a.btn:hover { text-decoration: none; }
         <tr><td>資料表</td><td><span class="cp"><code>TpDemoMeetingRoom</code></span></td></tr>
         <tr><td>支援項目</td><td>全部不勾</td></tr>
       </table>
+      <figure class="shot"><a href="img/stage2/u3.jpg" target="_blank" rel="noopener"><img src="img/stage2/u3.jpg" alt="會議室單元的表單，紅框標出名稱、編碼、所屬模組、資料表" loading="lazy" width="800"></a></figure>
     </li>
-    <li>儲存後，進「欄位設置」。單元已經有一個預設的名稱欄位 <code>FName</code>，把它的標題改成「會議室名稱」。再新增兩個欄位：
+    <li>按「保存」後，左側點「欄位設定」。單元已經有一個預設的名稱欄位 <code>FName</code>，點兩下打開，把標題改成「會議室名稱」，保存。
+      <figure class="shot"><a href="img/stage2/u5.jpg" target="_blank" rel="noopener"><img src="img/stage2/u5.jpg" alt="FName 欄位視窗，紅框標出標題「會議室名稱」" loading="lazy" width="800"></a></figure>
+      再按「新增」加兩個欄位：
       <table class="fields">
         <tr><th>標題</th><th>資料庫欄位</th><th>類型</th><th>長度</th><th>字典</th><th>必填</th><th>支援查詢</th></tr>
         <tr><td>會議室名稱</td><td><code>FName</code>（預設已有）</td><td>文字方塊</td><td>預設</td><td>—</td><td>✓</td><td>✓</td></tr>
         <tr><td>地點</td><td><span class="cp"><code>FMeetingRoomLocation</code></span></td><td>只選下拉清單</td><td>32</td><td>會議室地點</td><td>✓</td><td>✓</td></tr>
         <tr><td>樓層</td><td><span class="cp"><code>FMeetingRoomFloor</code></span></td><td>文字方塊</td><td>32</td><td>—</td><td></td><td>✓</td></tr>
       </table>
+      <figure class="shot"><a href="img/stage2/u6.jpg" target="_blank" rel="noopener"><img src="img/stage2/u6.jpg" alt="新增「地點」欄位，紅框標出標題、資料庫欄位、類型「只選下拉清單」、必填、字典「會議室地點」" loading="lazy" width="800"></a><figcaption>「支援查詢」預設已勾，保存後會問「是否繼續新增」，按「確定」就能接著加下一個。</figcaption></figure>
+      做完欄位清單會像這樣：
+      <figure class="shot"><a href="img/stage2/u7.jpg" target="_blank" rel="noopener"><img src="img/stage2/u7.jpg" alt="會議室的欄位清單，紅框標出 FMeetingRoomFloor、FMeetingRoomLocation、FName 三個欄位" loading="lazy" width="800"></a></figure>
     </li>
-    <li>儲存單元設定。</li>
+    <li><strong>把新欄位放到畫面上</strong>：新增的欄位不會自動出現在新增畫面和清單。
+      <ol>
+        <li>左側「表單類型」→ 點兩下「預設」→ 左邊點「基本資訊」→ 在「未選擇欄位」選「地點」「樓層」→ 按 <strong>→</strong> 移到「已選擇欄位」→「保存」。</li>
+        <li>左側「列表類型」→ 點兩下那一筆 → 一樣把「地點」「樓層」移到右邊 →「保存」。</li>
+      </ol>
+      <figure class="shot"><a href="img/stage2/f1.jpg" target="_blank" rel="noopener"><img src="img/stage2/f1.jpg" alt="表單類型視窗，紅框標出已選擇欄位裡的會議室名稱、地點、樓層，以及移動箭頭" loading="lazy" width="800"></a></figure>
+    </li>
   </ol>
 </section>
 
@@ -245,7 +265,7 @@ a.btn:hover { text-decoration: none; }
   <h1>建單元「會議室預約」</h1>
   <div class="meta"></div>
   <ol class="steps">
-    <li>「單元設定」再按「新增」。</li>
+    <li>「單元設定」再按「新增」→「實體單元（基於關聯式資料庫）」。</li>
     <li>基本資料：
       <table>
         <tr><th>項目</th><th>值</th></tr>
@@ -253,11 +273,12 @@ a.btn:hover { text-decoration: none; }
         <tr><td>編碼</td><td><span class="cp"><code>Demo.MeetingRoomApply</code></span></td></tr>
         <tr><td>所屬模組</td><td>通用功能</td></tr>
         <tr><td>資料表</td><td><span class="cp"><code>TpDemoMeetingRoomApply</code></span></td></tr>
-        <tr><td>支援項目</td><td>只勾「記錄建立資訊」（會自動記下建立者、建立時間）</td></tr>
+        <tr><td>支援項目</td><td>只勾「記錄建立資訊」（會自動記下建立部門、建立時間）</td></tr>
       </table>
+      <figure class="shot"><a href="img/stage2/a1.jpg" target="_blank" rel="noopener"><img src="img/stage2/a1.jpg" alt="會議室預約單元的表單，紅框標出名稱、編碼、記錄建立資訊、資料表" loading="lazy" width="800"></a></figure>
       不勾「支援工作流」：預約新增後直接生效，不用簽核。
     </li>
-    <li>「欄位設置」：預設的名稱欄位 <code>FName</code> 標題改成「會議主旨」，再新增三個欄位：
+    <li>保存後到「欄位設定」：除了 <code>FId</code>、<code>FName</code>，還會看到「記錄建立資訊」自動加的「建立部門」「建立時間」，不用動。預設的名稱欄位 <code>FName</code> 標題改成「會議主旨」，再新增三個欄位：
       <table class="fields">
         <tr><th>標題</th><th>資料庫欄位</th><th>類型</th><th>字典／實體</th><th>必填</th><th>支援查詢</th></tr>
         <tr><td>會議主旨</td><td><code>FName</code>（預設已有）</td><td>文字方塊</td><td>—</td><td>✓</td><td>✓</td></tr>
@@ -265,8 +286,12 @@ a.btn:hover { text-decoration: none; }
         <tr><td>開始時間</td><td><span class="cp"><code>FNormalMeetingStartDateTime</code></span></td><td>日期時間框</td><td>—</td><td>✓</td><td>✓</td></tr>
         <tr><td>結束時間</td><td><span class="cp"><code>FNormalMeetingEndDateTime</code></span></td><td>日期時間框</td><td>—</td><td>✓</td><td>✓</td></tr>
       </table>
+      <figure class="shot"><a href="img/stage2/a3.jpg" target="_blank" rel="noopener"><img src="img/stage2/a3.jpg" alt="新增「會議室」欄位，紅框標出類型「實體框」和下方實體資訊的實體單元「會議室」" loading="lazy" width="800"></a><figcaption>選「實體框」後，往下捲到「實體資訊」，實體單元選「會議室」。</figcaption></figure>
+      <figure class="shot"><a href="img/stage2/a4.jpg" target="_blank" rel="noopener"><img src="img/stage2/a4.jpg" alt="新增「結束時間」欄位，紅框標出類型「日期時間框」和必填" loading="lazy" width="800"></a></figure>
+      做完欄位清單會像這樣：
+      <figure class="shot"><a href="img/stage2/a5.jpg" target="_blank" rel="noopener"><img src="img/stage2/a5.jpg" alt="會議室預約的欄位清單，紅框標出 FMeetingRoomId、FNormalMeetingEndDateTime、FNormalMeetingStartDateTime" loading="lazy" width="800"></a></figure>
     </li>
-    <li>儲存單元設定。</li>
+    <li><strong>把新欄位放到畫面上</strong>：和「會議室」一樣，在「表單類型」（基本資訊）和「列表類型」把「會議室」「開始時間」「結束時間」依序移到「已選擇欄位」，保存。「建立時間」「建立部門」不用移。</li>
   </ol>
   <div class="note"><p>預約<strong>不存地點、樓層</strong>：這兩個值屬於會議室，預約只記「哪一間會議室」。BFF 查詢時再從「會議室」帶出地點、樓層。和 Sheet 版「預約」只放會議室編號是同一個道理。</p></div>
 </section>
@@ -276,19 +301,29 @@ a.btn:hover { text-decoration: none; }
   <div class="meta"></div>
   <p>和 Google Sheet 的範例一樣，方便你在階段三比對：換了資料來源，看板顯示的結果要相同。</p>
   <h2>會議室</h2>
-  <p>打開「會議室」單元 → 新增：</p>
+  <p>單元沒有放在功能表，直接用網址打開清單（要先登入 ECP），按「新增」，填好按「保存」：</p>
+  <p><span class="cp"><code>http://127.0.0.1:22821/aipower/Demo.MeetingRoom.List.page</code></span></p>
   <table>
     <tr><th>會議室名稱</th><th>地點</th><th>樓層</th></tr>
     <tr><td>九樓討論室</td><td>台北</td><td>9樓</td></tr>
     <tr><td>十樓大會議室</td><td>台北</td><td>10樓</td></tr>
   </table>
+  <figure class="shot"><a href="img/stage2/r1.jpg" target="_blank" rel="noopener"><img src="img/stage2/r1.jpg" alt="會議室新增畫面，紅框標出會議室名稱、地點、樓層" loading="lazy" width="800"></a></figure>
+  <figure class="shot"><a href="img/stage2/r2.jpg" target="_blank" rel="noopener"><img src="img/stage2/r2.jpg" alt="會議室清單，紅框標出九樓討論室和十樓大會議室兩筆" loading="lazy" width="800"></a></figure>
   <h2>會議室預約</h2>
-  <p>打開「會議室預約」單元 → 新增，日期填<strong>今天</strong>：</p>
+  <p>一樣用網址打開，按「新增」，日期填<strong>今天</strong>：</p>
+  <p><span class="cp"><code>http://127.0.0.1:22821/aipower/Demo.MeetingRoomApply.List.page</code></span></p>
   <table>
     <tr><th>會議主旨</th><th>會議室</th><th>開始</th><th>結束</th></tr>
     <tr><td>專案週會</td><td>九樓討論室</td><td>今天 09:00</td><td>今天 10:00</td></tr>
     <tr><td>客戶簡報</td><td>十樓大會議室</td><td>今天 14:00</td><td>今天 15:30</td></tr>
   </table>
+  <ul>
+    <li>「會議室」：打名稱的一部分（例如「九樓」），按 ↓ 再點跳出的會議室。</li>
+    <li>開始、結束時間：可以直接打 <code>2026-11-25 09:00</code> 這種格式（換成今天的日期）。</li>
+  </ul>
+  <figure class="shot"><a href="img/stage2/b1.jpg" target="_blank" rel="noopener"><img src="img/stage2/b1.jpg" alt="會議室預約新增畫面，紅框標出會議主旨、會議室、開始時間、結束時間" loading="lazy" width="800"></a></figure>
+  <figure class="shot"><a href="img/stage2/b2.jpg" target="_blank" rel="noopener"><img src="img/stage2/b2.jpg" alt="會議室預約清單，紅框標出客戶簡報和專案週會兩筆" loading="lazy" width="800"></a></figure>
   <div class="note"><p>ECP 的資料不會像 Sheet 的 <code>=TODAY()</code> 每天自動變成今天。之後練習時，看板查<strong>建資料的那一天</strong>就看得到。</p></div>
 </section>
 
@@ -305,7 +340,7 @@ a.btn:hover { text-decoration: none; }
   </table>
   <div class="warn"><p><strong>密碼是秘密</strong>：階段三只寫在 <code>bff/.env</code> 的 <code>ECP_LOGIN_PASSWORD=</code>，不要貼到 AI 對話裡。</p></div>
   <h2>做完了</h2>
-  <p>用 <code>/bff-verify</code> 選「階段二」驗收（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫在 <code>驗收檢核表/2_建立ECP單元.md</code>。</p>
+  <p>用 <code>/bff-verify</code> 選「建立 ECP 單元」驗收（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫在 <code>驗收檢核表/3_建立ECP單元.md</code>。</p>
   <p>下一步：<a href="stage3.html">階段三：改接 ECP</a>。</p>
 </section>
 
@@ -315,6 +350,7 @@ a.btn:hover { text-decoration: none; }
   <table>
     <tr><th>看到</th><th>原因</th></tr>
     <tr><td>新增預約時「會議室」選不到東西</td><td>還沒在「會議室」建資料，或實體框沒有選 <code>Demo.MeetingRoom</code></td></tr>
+    <tr><td>新增畫面或清單只看到名稱一個欄位</td><td>新欄位還沒放進「表單類型」「列表類型」的「已選擇欄位」</td></tr>
     <tr><td>「地點」下拉是空的</td><td>字典沒有字典項，或欄位沒有選「會議室地點」字典</td></tr>
     <tr><td>編碼或資料庫欄位打錯了</td><td>改成表格上的名稱；改不了就刪掉單元重建。或者階段三告訴 AI 你實際用的名稱</td></tr>
     <tr><td>想全部重來</td><td><code>重設ECP.cmd</code>（Mac：<code>bash ecp.sh reset</code>），<strong>ECP 裡的資料會全部刪除</strong></td></tr>

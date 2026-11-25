@@ -92,6 +92,10 @@ code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--
 .warn { background: var(--warn-bg); border-color: var(--warn-line); }
 .note > :first-child, .warn > :first-child { margin-top: 0; }
 .note > :last-child, .warn > :last-child { margin-bottom: 0; }
+/* 步驟截圖：紅框是要按或要填的地方，點圖片開原尺寸。 */
+figure.shot { margin: 10px 0 14px; }
+figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid #dadce0; border-radius: 4px; }
+figure.shot figcaption { margin-top: 4px; font-size: 13px; color: #5f6368; }
 
 details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
 details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
