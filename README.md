@@ -7,7 +7,7 @@ GitHub Pages 靜態網站，放學員看的操作說明。網址：<https://tama
 | `index.html` | 首頁：三個階段 |
 | `stage1.html` | 階段一：Sheet 版（準備 A～D、查詢、新增修改刪除、自我練習） |
 | `stage2.html` | 階段二：建立 ECP 單元 |
-| `stage3.html` | 階段三：改接 ECP（準備中） |
+| `stage3.html` | 階段三：改接 ECP |
 
 ## 怎麼改
 

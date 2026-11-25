@@ -166,14 +166,157 @@ a.btn:hover { text-decoration: none; }
 <div class="scrim" id="scrim"></div>
 <main class="viewport">
 
-<section data-step data-min="0" data-title="準備中">
-  <h1>準備中</h1>
+<section data-step data-min="2" data-title="概覽">
+  <h1>概覽</h1>
   <div class="meta"></div>
-  <p>這個階段的教材還在準備中。</p>
-  <p>到時候你會請 AI 在 BFF 加一個「ECP 轉接層」，把資料來源從 Google Sheet 換成階段二建好的 ECP 單元。前端、GraphQL、業務規則都不用改，這就是 BFF 分層的好處。</p>
-  <p>先完成 <a href="stage2.html">階段二：建立 ECP 單元</a>，並記下那一頁最後整理的設定。</p>
+  <p>這個階段把看板的資料來源從 Google Sheet 換成階段二建好的 ECP 單元。看板的畫面和操作<strong>完全一樣</strong>，查詢、新增、修改、刪除一次換完。</p>
+  <table>
+    <tr><th>段落</th><th>做什麼</th><th class="nw">誰動手</th></tr>
+    <tr><td>A. 加上 ECP 設定</td><td>在 <code>bff/.env</code> 加四行</td><td>你</td></tr>
+    <tr><td>請 AI 改接 ECP</td><td>新增 ECP 轉接層、讓設定可以切換資料來源</td><td class="nw">AI 寫程式，你驗收</td></tr>
+    <tr><td>驗收</td><td>同時看看板和 ECP 畫面，確認讀寫都正確</td><td>你</td></tr>
+    <tr><td>看懂程式 <span class="optional">選做</span></td><td>請 AI 帶你看轉接層</td><td>你</td></tr>
+  </table>
+  <h2>開始前</h2>
+  <ul>
+    <li>階段一的「新增修改刪除」驗收通過。</li>
+    <li>階段二做完：本地 ECP 已啟動，兩個單元和範例資料都在，「建立 ECP 單元」驗收通過。</li>
+    <li>手邊有階段二最後記下的設定（ECP 網址、帳號、兩個單元編碼）。</li>
+  </ul>
 </section>
 
+<section data-step data-min="3" data-title="為什麼只換一層">
+  <h1>為什麼只換一層</h1>
+  <div class="meta"></div>
+  <p>階段一的 BFF 分成好幾層，只有「資料來源轉接層」知道資料放在哪裡、要怎麼拿。換資料來源時，只要新增一個轉接層：</p>
+  <table>
+    <tr><th>檔案</th><th>這個階段</th></tr>
+    <tr><td><code>web/</code>（前端）</td><td><strong>不動</strong></td></tr>
+    <tr><td><code>bff/src/graphql/</code>（前端和 BFF 之間的約定）</td><td><strong>不動</strong></td></tr>
+    <tr><td><code>bff/src/meetingRooms/meetingRoomService.js</code>（業務規則：檢查輸入、衝突、排序）</td><td><strong>不動</strong></td></tr>
+    <tr><td><code>bff/src/sources/sheetSource.js</code>（Google Sheet 轉接層）</td><td>不動，留著可以切回去</td></tr>
+    <tr><td><code>bff/src/sources/ecpSource.js</code>、<code>ecpUnits.js</code></td><td><strong>新增</strong>：唯一會呼叫 ECP 的地方、ECP 白名單</td></tr>
+    <tr><td><code>bff/src/config.js</code>、<code>index.js</code></td><td>小改：讀 ECP 設定，依 <code>DATA_SOURCE</code> 選資料來源</td></tr>
+  </table>
+  <h2>Sheet 和 ECP 哪裡不一樣</h2>
+  <p>這些差異全部關在 <code>ecpSource.js</code> 裡，其他程式看不到：</p>
+  <table>
+    <tr><th></th><th>Google Sheet</th><th>ECP</th></tr>
+    <tr><td>怎麼證明「我是誰」</td><td>通行碼放在本文</td><td>帳號密碼放在 <code>Authorization</code> 標頭（ECP 有自己的特殊格式）</td></tr>
+    <tr><td>失敗時</td><td><code>ok: false</code></td><td>HTTP 一樣是 200，回應裡有 <code>_failed: true</code></td></tr>
+    <tr><td>欄位名稱</td><td>中文欄名（「主旨」）</td><td>F 開頭（<code>FName</code>）；加 <code>$</code> 是顯示文字（<code>Taipei</code> → <code>台北</code>）</td></tr>
+    <tr><td>編號</td><td><code>R01</code>、<code>B001</code></td><td>很長的亂碼（UUID），例如 <code>1a2117f9-0390-…</code></td></tr>
+    <tr><td>排序</td><td>Apps Script 不排序</td><td>ECP 也不能排序，回來的順序不固定</td></tr>
+  </table>
+  <div class="note"><p>排序、檢查輸入、衝突檢查本來就寫在 service，所以換成 ECP 一樣有效，不用重寫。</p></div>
+</section>
+
+<section data-step data-min="3" data-title="A. 在 bff/.env 加上 ECP 設定">
+  <h1>A. 在 <code>bff/.env</code> 加上 ECP 設定</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>用記事本（Mac：文字編輯）打開 <code>bff/.env</code>，在最下面加上這四行：
+      <div class="cp block pre"><code>DATA_SOURCE=ecp
+ECP_BASE_URL=http://127.0.0.1:22821/aipower
+ECP_LOGIN_NAME=administrator
+ECP_LOGIN_PASSWORD=</code></div>
+    </li>
+    <li>在 <code>ECP_LOGIN_PASSWORD=</code> 後面直接接上你的 ECP 密碼（在 <code>初始密碼.txt</code>；如果你改過密碼，填新的），不用加引號。</li>
+    <li>存檔。Sheet 的兩行（<code>SHEET_API_URL</code>、<code>SHEET_API_TOKEN</code>）留著，驗收時會切回去比較。</li>
+  </ol>
+  <div class="warn"><p><strong>ECP 密碼是秘密</strong>：只寫在 <code>bff/.env</code>，不要貼到 AI 對話裡。AI 被設定成不能讀 <code>.env</code>，它也不需要看到密碼。</p></div>
+  <table>
+    <tr><th>這一行</th><th>可以告訴 AI 嗎</th></tr>
+    <tr><td><code>DATA_SOURCE</code>、<code>ECP_BASE_URL</code>、<code>ECP_LOGIN_NAME</code></td><td>可以（公開資訊）</td></tr>
+    <tr><td><code>ECP_LOGIN_PASSWORD</code></td><td><strong>不可以</strong></td></tr>
+  </table>
+  <div class="note"><p>起始包的 <code>bff/.env.example</code> 也有這幾行和說明，可以對照。</p></div>
+</section>
+
+<section data-step data-min="15" data-title="請 AI 改接 ECP">
+  <h1>請 AI 改接 ECP</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>先停掉 BFF（在跑 <code>npm start</code> 的終端機按 Ctrl+C）。</li>
+    <li>在 Claude Code 輸入：<span class="cp"><code>/bff-ecp</code></span><br>
+      Codex 使用者：把起始包 <code>提示詞/3_改接ECP.md</code> 的內容整份貼上。</li>
+    <li>AI 會先問你四件事：階段一驗收過了嗎、階段二做完了嗎、單元編碼和欄位名稱和階段二的表格一樣嗎、<code>bff/.env</code> 加好 ECP 設定了嗎。都是就回答「是」。
+      <div class="note"><p>如果你在階段二用了不同的編碼或欄位名稱，這時告訴 AI 實際的名稱（這是公開資訊），它會寫進 <code>ecpUnits.js</code>。</p></div>
+    </li>
+    <li>AI 開始寫程式。它每寫完一個檔案會說明那個檔案負責什麼。注意看它最後列出的檔案：前端、GraphQL、service 應該都<strong>沒有</strong>在裡面。</li>
+    <li>寫完後在 <code>bff</code> 資料夾執行 <code>npm start</code>，終端機應該印出「資料來源：ECP」。打開 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>。</li>
+  </ol>
+  <div class="warn"><p>AI 如果要你把 ECP 密碼貼到對話裡，<strong>不要貼</strong>。密碼只放在 <code>bff/.env</code>。</p></div>
+  <div class="note"><p>ECP 的資料不會每天變成「今天」。看板要查<strong>你在階段二建範例資料的那一天</strong>，才看得到「專案週會」「客戶簡報」。</p></div>
+</section>
+
+<section data-step data-min="15" data-title="驗收：改接 ECP">
+  <h1>驗收：改接 ECP</h1>
+  <div class="meta"></div>
+  <p>輸入 <span class="cp"><code>/bff-verify</code></span>，選「改接 ECP」（Codex：貼上 <code>提示詞/驗收.md</code>），結果寫進 <code>驗收檢核表/4_改接ECP.md</code>。</p>
+  <p>寫入的項目要<strong>同時看看板和 ECP 畫面</strong>。ECP 的預約清單用這個網址打開，每次按「重新整理」：</p>
+  <p><span class="cp"><code>http://127.0.0.1:22821/aipower/Demo.MeetingRoomApply.List.page</code></span></p>
+  <h2>你會做的 8 件事</h2>
+  <table>
+    <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
+    <tr><td>1</td><td>看板查建範例資料的那一天</td><td>「專案週會」「客戶簡報」，依開始時間排序，地點「台北」</td></tr>
+    <tr><td>2</td><td>在 ECP 畫面新增一筆同一天的預約，回看板再查</td><td>新的那筆出現，不用重啟 BFF</td></tr>
+    <tr><td>3</td><td>在看板新增 16:00–17:00</td><td>看板和 ECP 清單都多一筆</td></tr>
+    <tr><td>4</td><td>改成 17:00–18:00</td><td>看板和 ECP 清單的時間都變了</td></tr>
+    <tr><td>5</td><td>刪除那筆</td><td>看板和 ECP 清單都不見了</td></tr>
+    <tr><td>6</td><td>在「九樓討論室」新增 09:30–10:30</td><td>「這個時段已經有人預約了」（<code>DATA-409</code>），ECP 沒有多一筆</td></tr>
+    <tr><td>7</td><td>停止 ECP（Windows：<code>停止ECP.cmd</code>；Mac：<code>bash ecp.sh stop</code>），看板再查</td><td>資料來源暫時無法使用（<code>DATA-503</code>），有追蹤編號；終端機沒有印出密碼。做完把 ECP 啟動回來</td></tr>
+    <tr><td>8</td><td><code>DATA_SOURCE</code> 改成 <code>sheet</code>，重新 <code>npm start</code></td><td>看板變回 Google Sheet 的資料，程式一行都沒改。做完改回 <code>ecp</code></td></tr>
+  </table>
+  <div class="note"><p>第 8 項就是這門課的重點：前端和業務規則完全不知道資料是從 Sheet 還是 ECP 來的。</p></div>
+</section>
+
+<section data-step data-min="10" data-optional data-title="看懂程式">
+  <h1>看懂程式</h1>
+  <div class="meta"></div>
+  <p>可以直接問 AI 下面這些問題，請它指出是哪個檔案、哪一段：</p>
+  <ul>
+    <li><span class="cp"><code>ecpSource.js 的 Authorization 標頭是怎麼組出來的？為什麼密碼不會出現在 log？</code></span></li>
+    <li><span class="cp"><code>ECP 回傳 _failed 的時候，BFF 怎麼決定要回 DATA-503、DATA-404 還是 DATA-502？</code></span></li>
+    <li><span class="cp"><code>ecpUnits.js 的白名單擋了哪些東西？如果前端想查別的單元會怎樣？</code></span></li>
+    <li><span class="cp"><code>為什麼排序和衝突檢查不用為 ECP 重寫？</code></span></li>
+  </ul>
+  <h2>一個值得記住的發現</h2>
+  <p>在 ECP 畫面上，「會議室」是必填，不選就存不了。但透過 API 寫入時，ECP <strong>不檢查必填，也不檢查選的會議室存不存在</strong>：畫面上的檢查只在畫面。</p>
+  <p>所以 BFF 的 service 在寫入前檢查主旨、會議室、時間，不是多此一舉，而是真正的防線。</p>
+</section>
+
+<section data-step data-min="1" data-title="做完了">
+  <h1>做完了</h1>
+  <div class="meta"></div>
+  <p>你完成了整門課：同一個看板，先接 Google Sheet，再接 ECP，前端和業務規則都沒改。</p>
+  <h2>回顧 BFF 做了哪些事</h2>
+  <table>
+    <tr><th>BFF 的工作</th><th>在這門課的哪裡</th></tr>
+    <tr><td>藏秘密</td><td>通行碼、ECP 密碼只在 <code>bff/.env</code>，前端和 AI 都看不到</td></tr>
+    <tr><td>白名單</td><td>只能讀寫固定的工作表、單元、欄位</td></tr>
+    <tr><td>檢查輸入</td><td>主旨、時間、會議室、時段衝突，在寫入前擋下</td></tr>
+    <tr><td>整理資料</td><td>中文欄名、F 開頭欄位都轉成 <code>topic</code>、<code>startsAt</code> 這類前端好懂的名稱</td></tr>
+    <tr><td>統一錯誤</td><td>不管資料來源是誰，前端只看到 <code>DATA-409</code>、<code>DATA-503</code> 這類代碼和追蹤編號</td></tr>
+  </table>
+  <p><a href="index.html">回到首頁</a></p>
+</section>
+
+<section data-step data-min="0" data-title="常見問題">
+  <h1>常見問題</h1>
+  <div class="meta"></div>
+  <table>
+    <tr><th>看到</th><th>原因</th></tr>
+    <tr><td><code>npm start</code> 拒絕啟動，說缺 ECP 設定</td><td><code>bff/.env</code> 少了某一行，或密碼後面是空的。照錯誤訊息補上</td></tr>
+    <tr><td>終端機還是印出「資料來源：Google Sheet」</td><td><code>DATA_SOURCE</code> 不是 <code>ecp</code>，或改完沒有重新 <code>npm start</code></td></tr>
+    <tr><td>看板顯示 <code>DATA-503</code>、<code>source_unavailable</code></td><td>ECP 沒有啟動，或 <code>ECP_BASE_URL</code> 打錯（結尾是 <code>/aipower</code>）</td></tr>
+    <tr><td>看板顯示 <code>DATA-503</code>、<code>source_auth_failed</code></td><td>ECP 帳號或密碼錯。改了 ECP 密碼的話，<code>bff/.env</code> 也要改</td></tr>
+    <tr><td>查詢沒有資料</td><td>查的日期不是建範例資料的那一天</td></tr>
+    <tr><td>看板顯示 <code>DATA-502</code></td><td>單元編碼或欄位名稱和 <code>ecpUnits.js</code> 不一樣。把 ECP 上實際的名稱告訴 AI</td></tr>
+    <tr><td>新增時說會議室不正確（<code>DATA-422</code>）</td><td>階段一的 service 可能只接受 <code>R01</code> 這種編號。請 AI 照 <code>/bff-ecp</code> 的說明，改成「必須是查得到的會議室」</td></tr>
+    <tr><td>看板新增成功，ECP 畫面沒看到</td><td>ECP 清單不會自動更新，按「重新整理」</td></tr>
+  </table>
+</section>
 
 </main>
 <div class="fabs">
