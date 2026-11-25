@@ -219,12 +219,13 @@ a.btn:hover { text-decoration: none; }
       <div class="cp block pre"><code>DATA_SOURCE=ecp
 ECP_BASE_URL=http://127.0.0.1:22821/aipower
 ECP_LOGIN_NAME=administrator
-ECP_LOGIN_PASSWORD=</code></div>
+ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     </li>
-    <li>在 <code>ECP_LOGIN_PASSWORD=</code> 後面直接接上你的 ECP 密碼（在 <code>初始密碼.txt</code>；如果你改過密碼，填新的），不用加引號。</li>
+    <li>把 <code>你的密碼</code> 換成你的 ECP 密碼（在 <code>初始密碼.txt</code>；如果你改過密碼，填新的），<strong>前後的單引號要留著</strong>。沒有單引號的話，密碼裡的 <code>#</code> 和後面的字會被當成註解切掉，ECP 就會說密碼錯。</li>
     <li>存檔。Sheet 的兩行（<code>SHEET_API_URL</code>、<code>SHEET_API_TOKEN</code>）留著，驗收時會切回去比較。</li>
   </ol>
   <div class="warn"><p><strong>ECP 密碼是秘密</strong>：只寫在 <code>bff/.env</code>，不要貼到 AI 對話裡。AI 被設定成不能讀 <code>.env</code>，它也不需要看到密碼。</p></div>
+  <div class="warn"><p><strong>密碼錯約 3 次，ECP 會把帳號鎖 30 分鐘</strong>，鎖住期間連 ECP 網頁也登不進去。BFF 收到一次帳密錯誤就會停止連線；看到 <code>source_auth_failed</code> 時，先檢查 <code>bff/.env</code> 的密碼再重新 <code>npm start</code>，不要一直重試。</p></div>
   <table>
     <tr><th>這一行</th><th>可以告訴 AI 嗎</th></tr>
     <tr><td><code>DATA_SOURCE</code>、<code>ECP_BASE_URL</code>、<code>ECP_LOGIN_NAME</code></td><td>可以（公開資訊）</td></tr>
@@ -310,7 +311,8 @@ ECP_LOGIN_PASSWORD=</code></div>
     <tr><td><code>npm start</code> 拒絕啟動，說缺 ECP 設定</td><td><code>bff/.env</code> 少了某一行，或密碼後面是空的。照錯誤訊息補上</td></tr>
     <tr><td>終端機還是印出「資料來源：Google Sheet」</td><td><code>DATA_SOURCE</code> 不是 <code>ecp</code>，或改完沒有重新 <code>npm start</code></td></tr>
     <tr><td>看板顯示 <code>DATA-503</code>、<code>source_unavailable</code></td><td>ECP 沒有啟動，或 <code>ECP_BASE_URL</code> 打錯（結尾是 <code>/aipower</code>）</td></tr>
-    <tr><td>看板顯示 <code>DATA-503</code>、<code>source_auth_failed</code></td><td>ECP 帳號或密碼錯。改了 ECP 密碼的話，<code>bff/.env</code> 也要改</td></tr>
+    <tr><td>看板顯示 <code>DATA-503</code>、<code>source_auth_failed</code></td><td>ECP 帳號或密碼錯。常見原因：密碼沒有用單引號包起來（密碼裡有 <code>#</code>），或改了 ECP 密碼但 <code>bff/.env</code> 沒改。改好後重新 <code>npm start</code></td></tr>
+    <tr><td>ECP 網頁說帳號已被鎖定</td><td>密碼連錯約 3 次。等 30 分鐘自動解鎖，這段時間先把 <code>bff/.env</code> 的密碼改對</td></tr>
     <tr><td>查詢沒有資料</td><td>查的日期不是建範例資料的那一天</td></tr>
     <tr><td>看板顯示 <code>DATA-502</code></td><td>單元編碼或欄位名稱和 <code>ecpUnits.js</code> 不一樣。把 ECP 上實際的名稱告訴 AI</td></tr>
     <tr><td>新增時說會議室不正確（<code>DATA-422</code>）</td><td>階段一的 service 可能只接受 <code>R01</code> 這種編號。請 AI 照 <code>/bff-ecp</code> 的說明，改成「必須是查得到的會議室」</td></tr>
