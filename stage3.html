@@ -240,8 +240,8 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     </li>
     <li>AI 開始寫程式。它每寫完一個檔案會說明那個檔案負責什麼。注意看它最後列出的檔案：前端、GraphQL、service 應該都<strong>沒有</strong>在裡面。</li>
     <li>寫完後在 <code>bff</code> 資料夾執行 <code>npm start</code>，終端機應該印出「資料來源：ECP」。打開 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>。
-      查建範例資料的那一天，會議室後面出現「台北」、表格是 ECP 裡的預約，就是接上了：
-      <figure class="shot"><a href="img/stage3/k1.jpg" target="_blank" rel="noopener"><img src="img/stage3/k1.jpg" alt="看板查 2026/11/25，紅框標出會議室選項的「台北 9樓」和從 ECP 查到的兩筆預約" loading="lazy" width="800"></a></figure></li>
+      查建範例資料的那一天，會議室後面出現「台北」、看到的是 ECP 裡的預約，就是接上了。你的看板外觀可以和下圖不一樣，看的是資料對不對：
+      <figure class="shot"><a href="img/stage3/k1.jpg" target="_blank" rel="noopener"><img src="img/stage3/k1.jpg" alt="看板查 2026/11/25，紅框標出時間軸上從 ECP 查到的兩筆預約，和會議室選項的「台北 9樓」" loading="lazy" width="800"></a></figure></li>
   </ol>
   <div class="note"><p>ECP 的資料不會每天變成「今天」。看板要查<strong>你在階段二建範例資料的那一天</strong>，才看得到「專案週會」「客戶簡報」。</p></div>
 </section>
@@ -265,7 +265,7 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     <tr><td>8</td><td><code>DATA_SOURCE</code> 改成 <code>sheet</code>，重新 <code>npm start</code></td><td>看板變回 Google Sheet 的資料，程式一行都沒改。做完改回 <code>ecp</code></td></tr>
   </table>
   <p>第 3 項做完的樣子：看板出現新的那筆，ECP 清單按「重新整理」後也多了同一筆。</p>
-  <figure class="shot"><a href="img/stage3/k2.jpg" target="_blank" rel="noopener"><img src="img/stage3/k2.jpg" alt="看板新增後，紅框標出「已新增「試跑會議」」訊息和 16:00–17:00 那一筆" loading="lazy" width="800"></a></figure>
+  <figure class="shot"><a href="img/stage3/k2.jpg" target="_blank" rel="noopener"><img src="img/stage3/k2.jpg" alt="看板新增後，紅框標出時間軸和清單上 16:00–17:00 的「試跑會議」，以及「已新增「試跑會議」」訊息" loading="lazy" width="800"></a></figure>
   <figure class="shot"><a href="img/stage3/e1.jpg" target="_blank" rel="noopener"><img src="img/stage3/e1.jpg" alt="ECP 會議室預約列表，紅框標出同一筆「試跑會議」" loading="lazy" width="800"></a></figure>
   <div class="note"><p>第 8 項就是這門課的重點：前端和業務規則完全不知道資料是從 Sheet 還是 ECP 來的。</p></div>
 </section>
