@@ -255,13 +255,9 @@ a.btn:hover { text-decoration: none; }
     </li>
     <li>存檔。</li>
   </ol>
-  <h2>哪些可以告訴 AI</h2>
-  <table>
-    <tr><th>項目</th><th>可以告訴 AI 嗎</th></tr>
-    <tr><td>網頁應用程式網址</td><td>可以（沒有通行碼也讀不到資料）</td></tr>
-    <tr><td>工作表名稱、欄位名稱</td><td>可以</td></tr>
-    <tr><td>通行碼</td><td><strong>不可以</strong>，只寫在 <code>bff/.env</code></td></tr>
-  </table>
+  <h2>為什麼通行碼放在 <code>.env</code></h2>
+  <p>通行碼放在 <code>.env</code>，是為了不寫進程式碼、不跟著程式上傳到 git，也不留在對話紀錄裡（對話內容會送到雲端）。以後在公司接正式系統的密碼，也是這樣處理。</p>
+  <p>程式執行時才從 <code>.env</code> 取得通行碼，所以 AI 寫程式不需要知道它；起始包也已經請 AI 不要讀 <code>.env</code>。網址、工作表名稱、欄位名稱不是秘密，直接告訴 AI 沒關係。</p>
 </section>
 
 <section data-step data-min="15" data-title="第一步：請 AI 做查詢">
@@ -276,7 +272,6 @@ a.btn:hover { text-decoration: none; }
     <li>AI 開始寫程式（時間依電腦和 AI 速度而定）。它每寫完一個檔案會說明那個檔案負責什麼，邊看邊問沒關係。</li>
     <li>AI 寫完會告訴你下一步：在 <code>bff</code> 資料夾執行 <code>npm start</code>，打開 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>。</li>
   </ol>
-  <div class="warn"><p>AI 如果要你把通行碼貼到對話裡，<strong>不要貼</strong>。通行碼只放在 <code>bff/.env</code>。</p></div>
 </section>
 
 <section data-step data-min="10" data-title="驗收：查詢">
@@ -327,7 +322,7 @@ a.btn:hover { text-decoration: none; }
   <h1>這個階段學到什麼</h1>
   <div class="meta"></div>
   <ul>
-    <li><strong>藏秘密</strong>：通行碼只在 BFF 的 <code>.env</code>，瀏覽器從頭到尾看不到。</li>
+    <li><strong>保管密碼</strong>：通行碼由 BFF 保管（放在 <code>.env</code>），瀏覽器從頭到尾看不到。</li>
     <li><strong>白名單</strong>：前端只能問 BFF 規定好的問題，不能指定要讀哪張工作表。</li>
     <li><strong>整理資料</strong>：試算表的中文欄名，由 BFF 轉成前端好用的格式。</li>
     <li><strong>統一錯誤</strong>：不管哪裡出錯，前端都收到同一種格式的錯誤代碼（例如 <code>DATA-409</code>）。</li>
@@ -574,7 +569,7 @@ function reply_(obj) {
   <h2>1. 準備一個空資料夾</h2>
   <ol class="steps">
     <li>建一個新資料夾，例如 <code>my-bff</code>（不要放在起始包裡面，也不要複製 <code>AGENTS.md</code> 和 <code>.claude/</code>）。</li>
-    <li>在 <code>my-bff</code> 裡建 <code>.claude/settings.json</code>，內容如下。這會禁止 Claude Code 讀取或修改 <code>.env</code>，先把秘密保護好：
+    <li>在 <code>my-bff</code> 裡建 <code>.claude/settings.json</code>，內容如下。這會讓 Claude Code 不去讀取或修改 <code>.env</code>（原因見準備 D）：
       <div class="cp block"><code>{ "permissions": { "deny": ["Read(**/.env)", "Edit(**/.env)"] } }</code></div>
       Codex 沒有這個設定，用 Codex 的人要在提示詞裡明講「不要讀取 .env」。</li>
     <li>把起始包的 <code>bff/.env</code> 複製到 <code>my-bff/.env</code>。</li>

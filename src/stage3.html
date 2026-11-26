@@ -58,14 +58,8 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     <li>把 <code>你的密碼</code> 換成你的 ECP 密碼（在 <code>初始密碼.txt</code>；如果你改過密碼，填新的），<strong>前後的單引號要留著</strong>。沒有單引號的話，密碼裡的 <code>#</code> 和後面的字會被當成註解切掉，ECP 就會說密碼錯。</li>
     <li>存檔。Sheet 的兩行（<code>SHEET_API_URL</code>、<code>SHEET_API_TOKEN</code>）留著，驗收時會切回去比較。</li>
   </ol>
-  <div class="warn"><p><strong>ECP 密碼是秘密</strong>：只寫在 <code>bff/.env</code>，不要貼到 AI 對話裡。AI 被設定成不能讀 <code>.env</code>，它也不需要看到密碼。</p></div>
   <div class="warn"><p><strong>密碼錯約 3 次，ECP 會把帳號鎖 30 分鐘</strong>，鎖住期間連 ECP 網頁也登不進去。BFF 收到一次帳密錯誤就會停止連線；看到 <code>source_auth_failed</code> 時，先檢查 <code>bff/.env</code> 的密碼再重新 <code>npm start</code>，不要一直重試。</p></div>
-  <table>
-    <tr><th>這一行</th><th>可以告訴 AI 嗎</th></tr>
-    <tr><td><code>DATA_SOURCE</code>、<code>ECP_BASE_URL</code>、<code>ECP_LOGIN_NAME</code></td><td>可以（公開資訊）</td></tr>
-    <tr><td><code>ECP_LOGIN_PASSWORD</code></td><td><strong>不可以</strong></td></tr>
-  </table>
-  <div class="note"><p>起始包的 <code>bff/.env.example</code> 也有這幾行和說明，可以對照。</p></div>
+  <div class="note"><p>密碼和階段一的通行碼一樣只寫在 <code>bff/.env</code>（原因見階段一準備 D）；網址和帳號不是秘密，可以直接告訴 AI。起始包的 <code>bff/.env.example</code> 也有這幾行和說明，可以對照。</p></div>
 </section>
 
 <section data-step data-min="15" data-title="請 AI 改接 ECP">
@@ -83,7 +77,6 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
       查建範例資料的那一天，會議室後面出現「台北」、表格是 ECP 裡的預約，就是接上了：
       <figure class="shot"><a href="img/stage3/k1.jpg" target="_blank" rel="noopener"><img src="img/stage3/k1.jpg" alt="看板查 2026/11/25，紅框標出會議室選項的「台北 9樓」和從 ECP 查到的兩筆預約" loading="lazy" width="800"></a></figure></li>
   </ol>
-  <div class="warn"><p>AI 如果要你把 ECP 密碼貼到對話裡，<strong>不要貼</strong>。密碼只放在 <code>bff/.env</code>。</p></div>
   <div class="note"><p>ECP 的資料不會每天變成「今天」。看板要查<strong>你在階段二建範例資料的那一天</strong>，才看得到「專案週會」「客戶簡報」。</p></div>
 </section>
 
@@ -133,7 +126,7 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
   <h2>回顧 BFF 做了哪些事</h2>
   <table>
     <tr><th>BFF 的工作</th><th>在這門課的哪裡</th></tr>
-    <tr><td>藏秘密</td><td>通行碼、ECP 密碼只在 <code>bff/.env</code>，前端和 AI 都看不到</td></tr>
+    <tr><td>保管密碼</td><td>通行碼、ECP 密碼由 BFF 保管在 <code>bff/.env</code>，瀏覽器看不到</td></tr>
     <tr><td>白名單</td><td>只能讀寫固定的工作表、單元、欄位</td></tr>
     <tr><td>檢查輸入</td><td>主旨、時間、會議室、時段衝突，在寫入前擋下</td></tr>
     <tr><td>整理資料</td><td>中文欄名、F 開頭欄位都轉成 <code>topic</code>、<code>startsAt</code> 這類前端好懂的名稱</td></tr>
