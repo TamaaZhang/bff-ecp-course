@@ -1,0 +1,130 @@
+<!-- title: 補充：軟體開發不只有寫程式 -->
+
+<section data-step data-min="2" data-title="概覽">
+  <h1>概覽</h1>
+  <div class="meta"></div>
+  <p>這一頁不用動手，只用讀的。前面三個階段你都在請 AI 寫程式、自己驗收；但在真正的專案裡，寫程式只是其中一段。</p>
+  <p>一個軟體從「有人想要」到「大家每天在用」，通常會經過下面六個階段，做完又會回到第一段。這整個過程叫做<strong>軟體開發生命週期</strong>（Software Development Life Cycle，簡稱 <strong>SDLC</strong>）。</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 680 430" role="img" aria-labelledby="sdlc-title sdlc-desc">
+      <title id="sdlc-title">軟體開發生命週期</title>
+      <desc id="sdlc-desc">六個階段圍成一圈：需求、設計、開發、測試、部署、維運，維運之後又回到需求。中間寫著：寫程式（開發）只是六段裡的一段。</desc>
+      <defs>
+        <marker id="sdlc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5f6368" />
+        </marker>
+      </defs>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#sdlc-arrow)">
+        <path d="M418 73 A240 150 0 0 1 497 102" />
+        <path d="M576 186 A240 150 0 0 1 576 244" />
+        <path d="M497 328 A240 150 0 0 1 418 357" />
+        <path d="M262 357 A240 150 0 0 1 183 328" />
+        <path d="M104 244 A240 150 0 0 1 104 186" />
+        <path d="M183 102 A240 150 0 0 1 262 73" />
+      </g>
+      <g class="node">
+        <g transform="translate(340 65)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">需求</text><text class="s" y="17">要做什麼</text></g>
+        <g transform="translate(548 140)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">設計</text><text class="s" y="17">打算怎麼做</text></g>
+        <g transform="translate(548 290)" class="dev"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">開發</text><text class="s" y="17">把它做出來</text></g>
+        <g transform="translate(340 365)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">測試</text><text class="s" y="17">做對了嗎</text></g>
+        <g transform="translate(132 290)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">部署</text><text class="s" y="17">交給使用者</text></g>
+        <g transform="translate(132 140)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">維運</text><text class="s" y="17">顧好、再改進</text></g>
+      </g>
+      <text class="center" x="340" y="207">寫程式（開發）</text>
+      <text class="center" x="340" y="235">只是六段裡的一段</text>
+    </svg>
+  </figure>
+  <p>接下來每一段都用一兩句話說明，再對照你在這門課做過的事。你會發現，六段你其實都走過了。</p>
+</section>
+
+<section data-step data-min="5" data-title="六個階段">
+  <h1>六個階段</h1>
+  <div class="meta"></div>
+
+  <h2>1. 需求：要做什麼</h2>
+  <p>先問清楚使用者遇到什麼問題、要軟體幫忙做什麼、什麼情況算做好。這一段沒說清楚，後面做得再好也可能做錯東西。</p>
+  <p class="eg"><strong>這門課：</strong>會議室預約看板要能查詢某一天的預約，也要能新增、修改、刪除；同一間會議室時間不能重疊。</p>
+
+  <h2>2. 設計：打算怎麼做</h2>
+  <p>決定系統分成哪幾塊、資料放哪裡、各部分之間怎麼溝通。像蓋房子前先畫設計圖，改圖比拆牆便宜。</p>
+  <p class="eg"><strong>這門課：</strong>前端只跟 BFF 說話、BFF 分成好幾層、資料欄位怎麼對照，都寫在 <code>AGENTS.md</code>；階段二在 ECP 建單元和欄位，也是在做設計。</p>
+
+  <h2>3. 開發：把它做出來</h2>
+  <p>照著需求和設計寫程式。大家最常想到的「做軟體」就是這一段。</p>
+  <p class="eg"><strong>這門課：</strong>由 AI 照 <code>AGENTS.md</code> 的規範寫程式。</p>
+
+  <h2>4. 測試：做對了嗎</h2>
+  <p>確認做出來的東西符合需求，而且出錯時不會壞掉或洩漏資料。找到問題就回到開發修正，再測一次。</p>
+  <p class="eg"><strong>這門課：</strong>AI 寫的自動測試，加上你照驗收清單一項一項操作，例如故意送錯的日期，看是不是被擋下來。</p>
+
+  <h2>5. 部署：交給使用者</h2>
+  <p>把程式放到使用者用得到的地方（通常是公司的伺服器），設定好密碼、網址這些環境設定，讓它正式開始服務。</p>
+  <p class="eg"><strong>這門課：</strong>在 <code>bff/.env</code> 放好設定、<code>npm start</code> 把 BFF 跑起來。真正的專案會部署到伺服器，讓大家都能連。</p>
+
+  <h2>6. 維運：顧好、再改進</h2>
+  <p>上線之後要持續看它有沒有正常運作、出問題時查原因，也會因為新的需求再改版。改版又會從需求開始，走一圈新的循環。</p>
+  <p class="eg"><strong>這門課：</strong>出錯時用錯誤代碼和 <code>requestId</code> 查問題；階段三把資料來源從 Google Sheet 換成 ECP，就是一次改版。</p>
+</section>
+
+<section data-step data-min="3" data-title="一次做完，還是分好幾輪">
+  <h1>一次做完，還是分好幾輪</h1>
+  <div class="meta"></div>
+  <p>六個階段可以只走一大圈，也可以切小、走很多圈。常見的有兩種做法：</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 680 300" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">瀑布式和反覆式的比較</title>
+      <desc id="flow-desc">上面是瀑布式：需求、設計、開發、測試、部署依序各做一次，最後才看到成品。下面是反覆式：分成三輪，第一輪只做查詢，第二輪加上新增修改刪除，第三輪改接 ECP，每一輪都走完需求到測試，做完就有一個可以用的版本。</desc>
+      <defs>
+        <marker id="flow-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5f6368" />
+        </marker>
+      </defs>
+      <text class="label" x="40" y="28">瀑布式：每一段做完才進下一段</text>
+      <g class="node">
+        <g transform="translate(80 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">需求</text></g>
+        <g transform="translate(184 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">設計</text></g>
+        <g transform="translate(288 70)" class="dev"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">開發</text></g>
+        <g transform="translate(392 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">測試</text></g>
+        <g transform="translate(496 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">部署</text></g>
+      </g>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#flow-arrow)">
+        <path d="M120 70 H142" /><path d="M224 70 H246" /><path d="M328 70 H350" /><path d="M432 70 H454" /><path d="M536 70 H558" />
+      </g>
+      <text class="done" x="566" y="75">成品</text>
+
+      <text class="label" x="40" y="148">反覆式（敏捷）：切小，每一輪都做出能用的版本</text>
+      <g class="round">
+        <g transform="translate(40 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 1 輪：查詢</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+        <g transform="translate(250 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 2 輪：新增修改刪除</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+        <g transform="translate(460 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 3 輪：改接 ECP</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+      </g>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#flow-arrow)">
+        <path d="M222 205 H246" /><path d="M432 205 H456" />
+      </g>
+      <text class="ok" x="130" y="272">可以用的版本</text>
+      <text class="ok" x="340" y="272">可以用的版本</text>
+      <text class="ok" x="550" y="272">可以用的版本</text>
+    </svg>
+  </figure>
+  <table>
+    <tr><th>做法</th><th>適合</th><th>要注意</th></tr>
+    <tr><td>瀑布式</td><td>需求一開始就很確定、之後很少改（例如法規規定的報表）</td><td>到最後才看到成品，那時才發現做錯，要改的範圍很大</td></tr>
+    <tr><td>反覆式（敏捷）</td><td>需求會邊做邊調整，想早一點給使用者試用</td><td>每一輪都要驗收；範圍沒控制好，會一直加功能做不完</td></tr>
+  </table>
+  <p>這門課用的是反覆式：先只做查詢並驗收，再加上新增修改刪除，最後才改接 ECP。每一輪做完，看板都是能用的。</p>
+</section>
+
+<section data-step data-min="2" data-title="有了 AI 之後">
+  <h1>有了 AI 之後</h1>
+  <div class="meta"></div>
+  <p>AI 讓「開發」這一段變快很多，但其他五段還是要靠人判斷：</p>
+  <table>
+    <tr><th>階段</th><th>為什麼還是要人</th></tr>
+    <tr><td>需求</td><td>AI 不知道你的使用者要什麼，要由你說清楚</td></tr>
+    <tr><td>設計</td><td>規範（例如 <code>AGENTS.md</code>）寫得越清楚，AI 寫出來的越接近你要的</td></tr>
+    <tr><td>測試</td><td>AI 說「完成了」不等於做對了，要有人照需求驗收</td></tr>
+    <tr><td>部署、維運</td><td>密碼由誰保管、出問題時誰負責，都是人要決定的事</td></tr>
+  </table>
+  <div class="note"><p>寫程式不再是最花時間的那一段之後，<strong>把要什麼說清楚</strong>和<strong>確認做對了</strong>反而變得更重要。這也是這門課一直請你做的事。</p></div>
+  <p><a href="index.html">回到首頁</a></p>
+</section>

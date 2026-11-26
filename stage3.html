@@ -97,6 +97,21 @@ figure.shot { margin: 10px 0 14px; }
 figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid #dadce0; border-radius: 4px; }
 figure.shot figcaption { margin-top: 4px; font-size: 13px; color: #5f6368; }
 
+/* 補充頁的示意圖（inline SVG）；layout 預設 svg 填 currentColor，這裡每個元素都明確給顏色。 */
+figure.diagram { margin: 12px 0 16px; }
+figure.diagram svg { width: 100%; height: auto; max-width: 680px; font-family: var(--sans); }
+.diagram .node rect { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
+.diagram .node .dev rect { fill: var(--blue); }
+.diagram .node .dev text { fill: #fff; }
+.diagram .round rect { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+.diagram text { fill: var(--strong); text-anchor: middle; }
+.diagram .t { font-size: 17px; font-weight: 500; }
+.diagram .s { font-size: 13px; fill: var(--muted); }
+.diagram .center { font-size: 18px; fill: var(--muted); }
+.diagram .label { font-size: 15px; font-weight: 500; text-anchor: start; }
+.diagram .done { font-size: 16px; font-weight: 500; text-anchor: start; }
+.diagram .ok { font-size: 14px; fill: var(--note-line); }
+p.eg { background: var(--drawer); border-left: 3px solid var(--line); padding: 6px 12px; margin: 6px 0 14px; }
 details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
 details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
 details[open] > summary { margin-bottom: 4px; }
@@ -298,7 +313,7 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     <tr><td>整理資料</td><td>中文欄名、F 開頭欄位都轉成 <code>topic</code>、<code>startsAt</code> 這類前端好懂的名稱</td></tr>
     <tr><td>統一錯誤</td><td>不管資料來源是誰，前端只看到 <code>DATA-409</code>、<code>DATA-503</code> 這類代碼和追蹤編號</td></tr>
   </table>
-  <p><a href="index.html">回到首頁</a></p>
+  <p>最後還有一頁補充：<a href="stage4.html">軟體開發不只有寫程式</a>，看看寫程式以外還有哪些階段。</p>
 </section>
 
 <section data-step data-min="0" data-title="常見問題">

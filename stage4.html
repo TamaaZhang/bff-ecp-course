@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>補充：軟體開發不只有寫程式</title>
+<style>
+/* 版面與配色參考 Google Codelabs。 */
+:root {
+  --page: #e8eaed; --drawer: #f8f9fa; --card: #ffffff; --text: #4e5256; --strong: #202124; --muted: #5f6368;
+  --line: #dadce0; --blue: #1a73e8; --blue-soft: #e8f0fe; --grey: #80868b; --green: #0f9d58;
+  --note-bg: #e6f4ea; --note-line: #137333; --warn-bg: #fce8e6; --warn-line: #c5221f;
+  --code-bg: #f1f3f4; --code-text: #37474f; --inline-code: #e8eaed;
+  --shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+  --btn-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12), 0 3px 1px -2px rgba(0, 0, 0, .2);
+  --sans: "Google Sans", Roboto, "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  --mono: "Roboto Mono", Consolas, "SF Mono", Menlo, monospace;
+  --top: 64px; --drawer-w: 256px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--page); color: var(--text); font: 14px/24px var(--sans); overflow: hidden; }
+a { color: var(--blue); font-weight: 500; text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+svg { display: block; fill: currentColor; }
+
+/* 頂部列 */
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--top); z-index: 20; display: flex; align-items: center; gap: 8px; padding: 0 24px 0 12px; background: var(--card); box-shadow: var(--shadow); color: #3c4043; }
+.icon-btn { all: unset; box-sizing: border-box; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: #5f6368; }
+.icon-btn:hover { background: var(--page); text-decoration: none; }
+.icon-btn:focus-visible { outline: 2px solid var(--blue); }
+.icon-btn[hidden] { display: none; }
+#menu-toggle { display: none; }
+.lab-title { flex: 1; min-width: 0; margin: 0 0 0 4px; font-size: 20px; font-weight: 400; color: #3c4043; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.remaining { display: flex; align-items: center; gap: 6px; flex: none; font-size: 14px; color: #3c4043; }
+
+/* 左側步驟列表 */
+.drawer { position: fixed; top: var(--top); left: 0; bottom: 0; width: var(--drawer-w); z-index: 10; overflow-y: auto; background: var(--drawer); padding: 6px 12px 24px; }
+.drawer ol { list-style: none; margin: 0; padding: 0; }
+.drawer button { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 55px; margin: 6px 0; padding: 3px 10px; cursor: pointer; background: var(--card); border: 1px solid var(--line); border-radius: 5px; color: var(--muted); font: 14px/20px var(--sans); transition: box-shadow .2s; }
+.drawer button:hover { box-shadow: var(--shadow); }
+.drawer button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.drawer button.reached { color: #212121; }
+.drawer button[aria-current="step"] { border-color: var(--card); box-shadow: var(--shadow); font-weight: 600; color: #212121; }
+.drawer .num { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--grey); color: #fff; font-size: 14px; font-weight: 400; }
+.drawer .reached .num { background: var(--blue); }
+.drawer .total { margin: 12px 4px 0; color: var(--muted); font-size: 13px; }
+
+/* 內容：每一步是一張卡片，切換時左右滑動 */
+.viewport { position: fixed; top: var(--top); left: var(--drawer-w); right: 0; bottom: 0; overflow: hidden; }
+section[data-step] { position: absolute; inset: 0; overflow-y: auto; padding: 32px 24px 112px; outline: none; }
+section[data-step][hidden] { display: none; }
+.card { max-width: 800px; margin: 0 auto; background: var(--card); border-radius: 4px; box-shadow: var(--shadow); padding: 24px 24px 32px; }
+.card h1 { margin: 0 0 30px; font-size: 28px; line-height: 1.3; font-weight: 400; color: var(--text); }
+.card h2 { margin: 28px 0 8px; font-size: 18px; font-weight: 500; color: var(--text); }
+.card h3 { margin: 22px 0 6px; font-size: 16px; font-weight: 500; color: var(--text); }
+.card .meta { display: none; }
+.card p, .card ul, .card ol { margin: 0 0 14px; }
+.card li { margin-bottom: 6px; }
+ol.steps > li { margin-bottom: 12px; }
+.path { font-weight: 600; color: var(--strong); }
+strong { color: var(--strong); font-weight: 600; }
+
+/* 表格撐滿卡片寬度；太寬時在外框裡左右捲動。 */
+.table-wrap { overflow-x: auto; margin: 10px 0 16px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
+th { background: var(--code-bg); color: var(--strong); font-weight: 500; white-space: nowrap; }
+/* 欄位設定表：格子不換行，太寬就在表格內左右捲動。 */
+table.fields th, table.fields td, th.nw, td.nw { white-space: nowrap; }
+
+/* 行內程式碼 */
+code { font-family: var(--mono); font-size: 90%; font-weight: 500; color: var(--code-text); background: var(--inline-code); border-radius: 4px; padding: 1px 4px; }
+.cp { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.copy-btn { all: unset; box-sizing: border-box; display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; color: #5f6368; }
+.copy-btn:hover { background: var(--page); color: var(--strong); }
+.copy-btn:focus-visible { outline: 2px solid var(--blue); }
+.copy-btn.done { color: var(--green); }
+
+/* 程式碼區塊：灰底、右上角複製圖示 */
+.cp.block { position: relative; display: block; white-space: normal; margin: 16px 0; background: var(--code-bg); }
+.cp.block code { display: block; padding: 8px 48px 8px 8px; background: none; border-radius: 0; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--code-text); white-space: pre-wrap; word-break: break-all; }
+.cp.block.pre code { white-space: pre; word-break: normal; overflow: auto; max-height: 420px; }
+.cp.block .copy-btn { position: absolute; top: 4px; right: 8px; width: 32px; height: 32px; background: var(--code-bg); }
+.cp.block .copy-btn:hover { background: var(--line); }
+
+/* 提示框 */
+.note, .warn { border: 1px solid; border-left-width: 4px; border-radius: 4px; padding: 15px 20px; margin: 16px 0; color: #212124; }
+.note { background: var(--note-bg); border-color: var(--note-line); }
+.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.note > :first-child, .warn > :first-child { margin-top: 0; }
+.note > :last-child, .warn > :last-child { margin-bottom: 0; }
+/* 步驟截圖：紅框是要按或要填的地方，點圖片開原尺寸。 */
+figure.shot { margin: 10px 0 14px; }
+figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid #dadce0; border-radius: 4px; }
+figure.shot figcaption { margin-top: 4px; font-size: 13px; color: #5f6368; }
+
+/* 補充頁的示意圖（inline SVG）；layout 預設 svg 填 currentColor，這裡每個元素都明確給顏色。 */
+figure.diagram { margin: 12px 0 16px; }
+figure.diagram svg { width: 100%; height: auto; max-width: 680px; font-family: var(--sans); }
+.diagram .node rect { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
+.diagram .node .dev rect { fill: var(--blue); }
+.diagram .node .dev text { fill: #fff; }
+.diagram .round rect { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+.diagram text { fill: var(--strong); text-anchor: middle; }
+.diagram .t { font-size: 17px; font-weight: 500; }
+.diagram .s { font-size: 13px; fill: var(--muted); }
+.diagram .center { font-size: 18px; fill: var(--muted); }
+.diagram .label { font-size: 15px; font-weight: 500; text-anchor: start; }
+.diagram .done { font-size: 16px; font-weight: 500; text-anchor: start; }
+.diagram .ok { font-size: 14px; fill: var(--note-line); }
+p.eg { background: var(--drawer); border-left: 3px solid var(--line); padding: 6px 12px; margin: 6px 0 14px; }
+details { border: 1px solid var(--line); border-radius: 4px; padding: 8px 14px; margin: 10px 0; }
+details > summary { cursor: pointer; font-weight: 500; color: var(--blue); }
+details[open] > summary { margin-bottom: 4px; }
+.optional { display: inline-block; font-size: 12px; line-height: 20px; font-weight: 500; color: var(--blue); background: var(--blue-soft); border-radius: 10px; padding: 0 8px; vertical-align: middle; }
+a.btn { display: inline-block; margin-bottom: 6px; padding: 6px 24px; border-radius: 4px; background: var(--blue); color: #fff; font-weight: 600; box-shadow: var(--btn-shadow); }
+a.btn:hover { text-decoration: none; }
+
+/* 固定在底部的上一步、下一步 */
+.fabs { position: fixed; left: var(--drawer-w); right: 0; bottom: 32px; z-index: 5; display: flex; padding: 0 80px; pointer-events: none; }
+.fab { all: unset; pointer-events: auto; box-sizing: border-box; display: inline-block; padding: 6px 24px; border-radius: 4px; cursor: pointer; font: 600 14px/24px var(--sans); box-shadow: var(--btn-shadow); }
+.fab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.fab.prev { background: var(--card); color: var(--blue); }
+.fab.next, .fab.done { background: var(--blue); color: #fff; margin-left: auto; }
+.fab.done { background: var(--green); }
+.fab.done:hover { text-decoration: none; }
+.fab[hidden] { display: none; }
+
+/* 大螢幕：卡片跟著變寬，字也大一點，不要只佔中間一小塊。 */
+@media (min-width: 1400px) {
+  :root { --drawer-w: 288px; }
+  body { font-size: 15px; line-height: 26px; }
+  .card { max-width: 1000px; padding: 32px 40px 40px; }
+}
+@media (min-width: 1800px) {
+  body { font-size: 16px; line-height: 28px; }
+  .card { max-width: 1160px; }
+  .drawer button { font-size: 15px; }
+}
+
+.scrim { display: none; }
+@media (max-width: 840px) {
+  #menu-toggle { display: grid; }
+  .topbar { padding-right: 12px; }
+  .drawer { width: 280px; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility .25s; box-shadow: var(--shadow); z-index: 30; }
+  .drawer.open { transform: none; visibility: visible; }
+  .scrim.open { display: block; position: fixed; inset: var(--top) 0 0 0; z-index: 25; background: rgba(32, 33, 36, .4); }
+  .viewport, .fabs { left: 0; }
+  section[data-step] { padding: 0 0 88px; }
+  .card { border-radius: 0; box-shadow: none; padding: 20px 16px 24px; }
+  .card h1 { font-size: 24px; margin-bottom: 20px; }
+  .fabs { padding: 0 16px; bottom: 16px; }
+  .remaining .label { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer { transition: none; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="icon-btn" id="menu-toggle" aria-label="所有步驟" aria-expanded="false" aria-controls="toc">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+  </button>
+  <a class="icon-btn" id="home" href="./" aria-label="回課程首頁" title="回課程首頁" hidden>
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </a>
+  <h1 class="lab-title">補充：軟體開發不只有寫程式</h1>
+  <div class="remaining">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+    <span id="remaining"></span>
+  </div>
+</header>
+<nav class="drawer" id="toc" aria-label="步驟">
+  <ol id="toc-list"></ol>
+  <div class="total" id="total"></div>
+</nav>
+<div class="scrim" id="scrim"></div>
+<main class="viewport">
+
+<section data-step data-min="2" data-title="概覽">
+  <h1>概覽</h1>
+  <div class="meta"></div>
+  <p>這一頁不用動手，只用讀的。前面三個階段你都在請 AI 寫程式、自己驗收；但在真正的專案裡，寫程式只是其中一段。</p>
+  <p>一個軟體從「有人想要」到「大家每天在用」，通常會經過下面六個階段，做完又會回到第一段。這整個過程叫做<strong>軟體開發生命週期</strong>（Software Development Life Cycle，簡稱 <strong>SDLC</strong>）。</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 680 430" role="img" aria-labelledby="sdlc-title sdlc-desc">
+      <title id="sdlc-title">軟體開發生命週期</title>
+      <desc id="sdlc-desc">六個階段圍成一圈：需求、設計、開發、測試、部署、維運，維運之後又回到需求。中間寫著：寫程式（開發）只是六段裡的一段。</desc>
+      <defs>
+        <marker id="sdlc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5f6368" />
+        </marker>
+      </defs>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#sdlc-arrow)">
+        <path d="M418 73 A240 150 0 0 1 497 102" />
+        <path d="M576 186 A240 150 0 0 1 576 244" />
+        <path d="M497 328 A240 150 0 0 1 418 357" />
+        <path d="M262 357 A240 150 0 0 1 183 328" />
+        <path d="M104 244 A240 150 0 0 1 104 186" />
+        <path d="M183 102 A240 150 0 0 1 262 73" />
+      </g>
+      <g class="node">
+        <g transform="translate(340 65)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">需求</text><text class="s" y="17">要做什麼</text></g>
+        <g transform="translate(548 140)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">設計</text><text class="s" y="17">打算怎麼做</text></g>
+        <g transform="translate(548 290)" class="dev"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">開發</text><text class="s" y="17">把它做出來</text></g>
+        <g transform="translate(340 365)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">測試</text><text class="s" y="17">做對了嗎</text></g>
+        <g transform="translate(132 290)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">部署</text><text class="s" y="17">交給使用者</text></g>
+        <g transform="translate(132 140)"><rect x="-56" y="-28" width="112" height="56" rx="8" /><text class="t" y="-3">維運</text><text class="s" y="17">顧好、再改進</text></g>
+      </g>
+      <text class="center" x="340" y="207">寫程式（開發）</text>
+      <text class="center" x="340" y="235">只是六段裡的一段</text>
+    </svg>
+  </figure>
+  <p>接下來每一段都用一兩句話說明，再對照你在這門課做過的事。你會發現，六段你其實都走過了。</p>
+</section>
+
+<section data-step data-min="5" data-title="六個階段">
+  <h1>六個階段</h1>
+  <div class="meta"></div>
+
+  <h2>1. 需求：要做什麼</h2>
+  <p>先問清楚使用者遇到什麼問題、要軟體幫忙做什麼、什麼情況算做好。這一段沒說清楚，後面做得再好也可能做錯東西。</p>
+  <p class="eg"><strong>這門課：</strong>會議室預約看板要能查詢某一天的預約，也要能新增、修改、刪除；同一間會議室時間不能重疊。</p>
+
+  <h2>2. 設計：打算怎麼做</h2>
+  <p>決定系統分成哪幾塊、資料放哪裡、各部分之間怎麼溝通。像蓋房子前先畫設計圖，改圖比拆牆便宜。</p>
+  <p class="eg"><strong>這門課：</strong>前端只跟 BFF 說話、BFF 分成好幾層、資料欄位怎麼對照，都寫在 <code>AGENTS.md</code>；階段二在 ECP 建單元和欄位，也是在做設計。</p>
+
+  <h2>3. 開發：把它做出來</h2>
+  <p>照著需求和設計寫程式。大家最常想到的「做軟體」就是這一段。</p>
+  <p class="eg"><strong>這門課：</strong>由 AI 照 <code>AGENTS.md</code> 的規範寫程式。</p>
+
+  <h2>4. 測試：做對了嗎</h2>
+  <p>確認做出來的東西符合需求，而且出錯時不會壞掉或洩漏資料。找到問題就回到開發修正，再測一次。</p>
+  <p class="eg"><strong>這門課：</strong>AI 寫的自動測試，加上你照驗收清單一項一項操作，例如故意送錯的日期，看是不是被擋下來。</p>
+
+  <h2>5. 部署：交給使用者</h2>
+  <p>把程式放到使用者用得到的地方（通常是公司的伺服器），設定好密碼、網址這些環境設定，讓它正式開始服務。</p>
+  <p class="eg"><strong>這門課：</strong>在 <code>bff/.env</code> 放好設定、<code>npm start</code> 把 BFF 跑起來。真正的專案會部署到伺服器，讓大家都能連。</p>
+
+  <h2>6. 維運：顧好、再改進</h2>
+  <p>上線之後要持續看它有沒有正常運作、出問題時查原因，也會因為新的需求再改版。改版又會從需求開始，走一圈新的循環。</p>
+  <p class="eg"><strong>這門課：</strong>出錯時用錯誤代碼和 <code>requestId</code> 查問題；階段三把資料來源從 Google Sheet 換成 ECP，就是一次改版。</p>
+</section>
+
+<section data-step data-min="3" data-title="一次做完，還是分好幾輪">
+  <h1>一次做完，還是分好幾輪</h1>
+  <div class="meta"></div>
+  <p>六個階段可以只走一大圈，也可以切小、走很多圈。常見的有兩種做法：</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 680 300" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">瀑布式和反覆式的比較</title>
+      <desc id="flow-desc">上面是瀑布式：需求、設計、開發、測試、部署依序各做一次，最後才看到成品。下面是反覆式：分成三輪，第一輪只做查詢，第二輪加上新增修改刪除，第三輪改接 ECP，每一輪都走完需求到測試，做完就有一個可以用的版本。</desc>
+      <defs>
+        <marker id="flow-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5f6368" />
+        </marker>
+      </defs>
+      <text class="label" x="40" y="28">瀑布式：每一段做完才進下一段</text>
+      <g class="node">
+        <g transform="translate(80 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">需求</text></g>
+        <g transform="translate(184 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">設計</text></g>
+        <g transform="translate(288 70)" class="dev"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">開發</text></g>
+        <g transform="translate(392 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">測試</text></g>
+        <g transform="translate(496 70)"><rect x="-40" y="-18" width="80" height="36" rx="6" /><text class="t" y="6">部署</text></g>
+      </g>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#flow-arrow)">
+        <path d="M120 70 H142" /><path d="M224 70 H246" /><path d="M328 70 H350" /><path d="M432 70 H454" /><path d="M536 70 H558" />
+      </g>
+      <text class="done" x="566" y="75">成品</text>
+
+      <text class="label" x="40" y="148">反覆式（敏捷）：切小，每一輪都做出能用的版本</text>
+      <g class="round">
+        <g transform="translate(40 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 1 輪：查詢</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+        <g transform="translate(250 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 2 輪：新增修改刪除</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+        <g transform="translate(460 166)"><rect width="180" height="78" rx="10" /><text class="t" x="90" y="30">第 3 輪：改接 ECP</text><text class="s" x="90" y="56">需求→設計→開發→測試</text></g>
+      </g>
+      <g fill="none" stroke="#5f6368" stroke-width="2" marker-end="url(#flow-arrow)">
+        <path d="M222 205 H246" /><path d="M432 205 H456" />
+      </g>
+      <text class="ok" x="130" y="272">可以用的版本</text>
+      <text class="ok" x="340" y="272">可以用的版本</text>
+      <text class="ok" x="550" y="272">可以用的版本</text>
+    </svg>
+  </figure>
+  <table>
+    <tr><th>做法</th><th>適合</th><th>要注意</th></tr>
+    <tr><td>瀑布式</td><td>需求一開始就很確定、之後很少改（例如法規規定的報表）</td><td>到最後才看到成品，那時才發現做錯，要改的範圍很大</td></tr>
+    <tr><td>反覆式（敏捷）</td><td>需求會邊做邊調整，想早一點給使用者試用</td><td>每一輪都要驗收；範圍沒控制好，會一直加功能做不完</td></tr>
+  </table>
+  <p>這門課用的是反覆式：先只做查詢並驗收，再加上新增修改刪除，最後才改接 ECP。每一輪做完，看板都是能用的。</p>
+</section>
+
+<section data-step data-min="2" data-title="有了 AI 之後">
+  <h1>有了 AI 之後</h1>
+  <div class="meta"></div>
+  <p>AI 讓「開發」這一段變快很多，但其他五段還是要靠人判斷：</p>
+  <table>
+    <tr><th>階段</th><th>為什麼還是要人</th></tr>
+    <tr><td>需求</td><td>AI 不知道你的使用者要什麼，要由你說清楚</td></tr>
+    <tr><td>設計</td><td>規範（例如 <code>AGENTS.md</code>）寫得越清楚，AI 寫出來的越接近你要的</td></tr>
+    <tr><td>測試</td><td>AI 說「完成了」不等於做對了，要有人照需求驗收</td></tr>
+    <tr><td>部署、維運</td><td>密碼由誰保管、出問題時誰負責，都是人要決定的事</td></tr>
+  </table>
+  <div class="note"><p>寫程式不再是最花時間的那一段之後，<strong>把要什麼說清楚</strong>和<strong>確認做對了</strong>反而變得更重要。這也是這門課一直請你做的事。</p></div>
+  <p><a href="index.html">回到首頁</a></p>
+</section>
+
+</main>
+<div class="fabs">
+  <button type="button" class="fab prev" id="prev">上一步</button>
+  <button type="button" class="fab next" id="next">下一步</button>
+  <a class="fab done" id="done" href="./" hidden>完成</a>
+</div>
+
+<script>
+(function () {
+  const sections = Array.from(document.querySelectorAll('section[data-step]'));
+  const list = document.getElementById('toc-list');
+  const nav = document.getElementById('toc');
+  const scrim = document.getElementById('scrim');
+  const toggle = document.getElementById('menu-toggle');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const done = document.getElementById('done');
+  const remaining = document.getElementById('remaining');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const minutes = function (s) { return s.hasAttribute('data-optional') ? 0 : Number(s.dataset.min) || 0; };
+  let current = -1;
+  let finishSlide = null;
+
+  // 放在教學網站上才有首頁；學員直接打開檔案時不顯示首頁連結，「完成」也不顯示。
+  const onSite = location.protocol === 'https:' || location.protocol === 'http:';
+  document.getElementById('home').hidden = !onSite;
+
+  document.querySelectorAll('section[data-step] table').forEach(function (t) {
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // 選做的自我練習（data-optional）不算進總時間。
+  const total = sections.reduce(function (sum, s) { return sum + minutes(s); }, 0);
+  const hasOptional = sections.some(function (s) { return s.hasAttribute('data-optional'); });
+  document.getElementById('total').textContent = '預計 ' + total + ' 分鐘' + (hasOptional ? '（不含自我練習）' : '');
+
+  const buttons = sections.map(function (s, i) {
+    // 每一步的內容包成一張卡片，標題前面加上步驟編號。
+    const card = document.createElement('div');
+    card.className = 'card';
+    while (s.firstChild) card.append(s.firstChild);
+    s.append(card);
+    s.tabIndex = -1;
+    s.hidden = true;
+    const h1 = card.querySelector('h1');
+    if (h1) h1.prepend((i + 1) + '. ');
+
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = i + 1;
+    const label = document.createElement('span');
+    label.textContent = s.dataset.title;
+    b.append(num, label);
+    b.addEventListener('click', function () { go(i); setMenu(false); });
+    li.append(b);
+    list.append(li);
+    return b;
+  });
+
+  function setMenu(open) {
+    nav.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+  toggle.addEventListener('click', function () { setMenu(!nav.classList.contains('open')); });
+  scrim.addEventListener('click', function () { setMenu(false); });
+
+  // 換頁並把步驟寫進網址（#3），重新整理或分享連結時會停在同一步。
+  function go(i) {
+    if (i < 0 || i >= sections.length || i === current) return;
+    show(i, true);
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) { /* 有些預覽環境不能改網址，不影響換頁 */ }
+  }
+
+  function fromHash() {
+    const i = parseInt(location.hash.slice(1), 10) - 1;
+    return i >= 0 && i < sections.length ? i : 0;
+  }
+
+  function show(i, animate) {
+    if (finishSlide) finishSlide();
+    const from = sections[current];
+    const to = sections[i];
+    const dir = i > current ? 1 : -1;
+    to.hidden = false;
+    to.scrollTop = 0;
+    if (from && animate && !reduceMotion.matches) {
+      // 新的一步從旁邊滑進來，舊的一步滑出去（和 Google Codelabs 一樣）。
+      const ease = 'transform .5s cubic-bezier(.4, 0, .2, 1)';
+      to.style.transition = 'none';
+      to.style.transform = 'translate3d(' + (110 * dir) + '%, 0, 0)';
+      void to.offsetWidth;
+      to.style.transition = ease;
+      from.style.transition = ease;
+      to.style.transform = 'translate3d(0, 0, 0)';
+      from.style.transform = 'translate3d(' + (-110 * dir) + '%, 0, 0)';
+      const timer = setTimeout(function () { if (finishSlide) finishSlide(); }, 550);
+      finishSlide = function () {
+        clearTimeout(timer);
+        from.hidden = true;
+        from.style.transition = from.style.transform = '';
+        to.style.transition = to.style.transform = '';
+        finishSlide = null;
+      };
+    } else if (from) {
+      from.hidden = true;
+    }
+    current = i;
+    to.focus({ preventScroll: true });
+
+    let left = 0;
+    sections.forEach(function (s, j) { if (j >= i) left += minutes(s); });
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = '還剩 ';
+    remaining.replaceChildren(label, left + ' 分鐘');
+
+    buttons.forEach(function (b, j) {
+      if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.classList.toggle('reached', j <= i);
+    });
+    buttons[i].scrollIntoView({ block: 'nearest' });
+    const last = i === sections.length - 1;
+    prev.hidden = i === 0;
+    next.hidden = last;
+    done.hidden = !last || !onSite;
+    document.title = (i + 1) + '. ' + to.dataset.title + '｜補充：軟體開發不只有寫程式';
+  }
+
+  prev.addEventListener('click', function () { go(current - 1); });
+  next.addEventListener('click', function () { go(current + 1); });
+  window.addEventListener('hashchange', function () { go(fromHash()); });
+
+  // 鍵盤左右方向鍵換頁；焦點在輸入框或程式碼區塊（要左右捲動）時不換頁。
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const t = e.target;
+    if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Escape') setMenu(false);
+  });
+
+  // 複製按鈕：學員照抄的值一律用複製，避免打錯字。
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+  }
+  const copyIcon = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+  const doneIcon = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+  document.querySelectorAll('.cp').forEach(function (wrap) {
+    const text = wrap.querySelector('code').textContent;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'copy-btn';
+    b.innerHTML = copyIcon;
+    b.title = '複製';
+    b.setAttribute('aria-label', wrap.classList.contains('block') ? '複製程式碼' : '複製 ' + text);
+    b.addEventListener('click', function () {
+      copyText(text).then(function () {
+        b.innerHTML = doneIcon;
+        b.classList.add('done');
+        b.title = '已複製';
+      }, function () { b.title = '請手動選取'; });
+      setTimeout(function () { b.innerHTML = copyIcon; b.classList.remove('done'); b.title = '複製'; }, 1500);
+    });
+    wrap.append(b);
+  });
+
+  show(fromHash(), false);
+})();
+</script>
+</body>
+</html>
