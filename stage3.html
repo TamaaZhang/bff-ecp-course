@@ -312,6 +312,7 @@ ECP_LOGIN_PASSWORD='你的密碼'</code></div>
     <tr><td>看板顯示 <code>DATA-503</code>、<code>source_auth_failed</code></td><td>ECP 帳號或密碼錯。常見原因：密碼沒有用單引號包起來（密碼裡有 <code>#</code>），或改了 ECP 密碼但 <code>bff/.env</code> 沒改。改好後重新 <code>npm start</code></td></tr>
     <tr><td>ECP 網頁說帳號已被鎖定</td><td>密碼連錯約 3 次。等 30 分鐘自動解鎖，這段時間先把 <code>bff/.env</code> 的密碼改對</td></tr>
     <tr><td>查詢沒有資料</td><td>查的日期不是建範例資料的那一天</td></tr>
+    <tr><td>會議室後面沒有「台北」</td><td>查地點的顯示文字（<code>FMeetingRoomLocation$</code>）時，ECP 規定原欄位 <code>FMeetingRoomLocation</code> 也要一起查，不然什麼都不回、也不報錯。請 AI 照 <code>AGENTS.md</code> 第 7 節修正 <code>ecpSource.js</code> 的 <code>fieldNames</code></td></tr>
     <tr><td>看板顯示 <code>DATA-502</code></td><td>單元編碼或欄位名稱和 <code>ecpUnits.js</code> 不一樣。把 ECP 上實際的名稱告訴 AI</td></tr>
     <tr><td>新增時說會議室不正確（<code>DATA-422</code>）</td><td>階段一的 service 可能只接受 <code>R01</code> 這種編號。請 AI 照 <code>/bff-ecp</code> 的說明，改成「必須是查得到的會議室」</td></tr>
     <tr><td>看板新增成功，ECP 畫面沒看到</td><td>ECP 清單不會自動更新，按「重新整理」</td></tr>

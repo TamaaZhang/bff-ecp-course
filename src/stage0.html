@@ -1,0 +1,122 @@
+<!-- title: 課前準備 -->
+
+<section data-step data-min="2" data-title="概覽">
+  <h1>概覽</h1>
+  <div class="meta"></div>
+  <p>開始階段一之前，先把電腦準備好。從公司 OneDrive 下載兩個壓縮檔之後，照這一頁做完就可以上課。</p>
+  <table>
+    <tr><th>段落</th><th>做什麼</th><th class="nw">什麼時候用到</th></tr>
+    <tr><td>A. 解壓縮</td><td>把學員起始包、本地 ECP 教材包放到電腦上</td><td class="nw">全部</td></tr>
+    <tr><td>B. 安裝 Node.js</td><td>BFF 用它來執行</td><td class="nw">階段一起</td></tr>
+    <tr><td>C. 安裝 Claude Code</td><td>請 AI 寫程式</td><td class="nw">階段一起</td></tr>
+    <tr><td>D. 啟動本地 ECP</td><td>安裝 Docker Desktop，第一次啟動 ECP、登入</td><td class="nw">階段二起</td></tr>
+    <tr><td>E. 確認</td><td>三件事都正常</td><td class="nw">上課前</td></tr>
+  </table>
+  <h2>需要</h2>
+  <ul>
+    <li>Windows 10／11（Mac 也可以，但本地 ECP 在 Mac 上還沒有實機測過）</li>
+    <li>記憶體 8GB 以上、硬碟空間 5GB 以上</li>
+    <li>可以安裝軟體的權限（公司電腦可能要請 IT 開）</li>
+    <li>Claude 付費帳號（Pro 以上）</li>
+  </ul>
+</section>
+
+<section data-step data-min="3" data-title="A. 解壓縮">
+  <h1>A. 解壓縮</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>在電腦上建一個資料夾放課程檔案，例如 <code>C:\bff-course</code>。路徑<strong>不要有空白</strong>，最好也不要放在 OneDrive 同步的資料夾裡。</li>
+    <li>把兩個壓縮檔都解壓縮到這個資料夾（Windows：在壓縮檔上按右鍵 →「解壓縮全部」；Mac：連按兩下）：
+      <table>
+        <tr><th>壓縮檔</th><th>解開後</th><th>用途</th></tr>
+        <tr><td>學員起始包</td><td>裡面有 <code>AGENTS.md</code>、<code>bff</code>、<code>web</code>、<code>提示詞</code> 等</td><td>你的專案，AI 在這裡寫程式</td></tr>
+        <tr><td>本地 ECP 教材包</td><td>裡面有 <code>啟動ECP.cmd</code>、<code>初始密碼.txt</code>、<code>ecp-teaching-images.tar</code> 等</td><td>在自己電腦上跑一套 ECP</td></tr>
+      </table>
+    </li>
+  </ol>
+  <div class="warn"><p>一定要先解壓縮。直接在壓縮檔裡面連按兩下打開的檔案，程式會找不到其他檔案。</p></div>
+</section>
+
+<section data-step data-min="5" data-title="B. 安裝 Node.js">
+  <h1>B. 安裝 Node.js</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>打開 <a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a>，下載 <strong>LTS</strong> 版（22 或更新）。</li>
+    <li>執行安裝程式（Windows 是 <code>.msi</code>、Mac 是 <code>.pkg</code>），選項都用預設，一直按「Next」到完成。</li>
+    <li><strong>重新打開</strong>一個終端機（Windows：開始功能表搜尋 PowerShell；Mac：終端機），輸入：
+      <div class="cp block"><code>node --version</code></div>
+      看到 <code>v22.9.0</code> 或更大的數字（例如 <code>v22.12.0</code>、<code>v24.1.0</code>）就對了。</li>
+  </ol>
+  <div class="note"><p>出現「無法辨識 node」或 command not found：通常是終端機在安裝前就開著。把它關掉重開；還是不行就重新開機。</p></div>
+</section>
+
+<section data-step data-min="5" data-title="C. 安裝 Claude Code">
+  <h1>C. 安裝 Claude Code</h1>
+  <div class="meta"></div>
+  <ol class="steps">
+    <li>打開 <a href="https://claude.ai/download" target="_blank" rel="noopener">https://claude.ai/download</a>，下載並安裝 Claude 桌面 App。</li>
+    <li>打開 App，用你的 Claude 帳號登入。</li>
+    <li>切到 <strong>Code</strong> 分頁，選擇 A 解開的<strong>學員起始包</strong>資料夾。App 如果提示要安裝其他元件（例如 Git），照提示安裝。</li>
+    <li>在對話框輸入「這個資料夾是做什麼的？」。AI 能說出這是會議室預約看板的課程專案，就設定好了。</li>
+  </ol>
+  <div class="note"><p>用 Codex 的人：照 Codex 的說明安裝，打開同一個學員起始包資料夾。之後每個步驟改成貼上 <code>提示詞/</code> 裡對應的檔案。</p></div>
+</section>
+
+<section data-step data-min="15" data-title="D. 啟動本地 ECP">
+  <h1>D. 啟動本地 ECP</h1>
+  <div class="meta"></div>
+  <p>本地 ECP 跑在 Docker 裡：不用安裝資料庫，也不會動到電腦上其他的程式。</p>
+  <h2>1. 安裝 Docker Desktop</h2>
+  <ol class="steps">
+    <li>打開 <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">https://www.docker.com/products/docker-desktop/</a>，下載並安裝 Docker Desktop（Mac 要選對晶片：Apple Silicon 或 Intel）。</li>
+    <li>Windows 安裝時如果要求安裝或更新 WSL，照提示做，完成後重新開機。</li>
+    <li>打開 Docker Desktop，等左下角顯示 <strong>Engine running</strong>。第一次打開會問要不要登入，可以跳過。</li>
+  </ol>
+  <h2>2. 第一次啟動 ECP</h2>
+  <ol class="steps">
+    <li>Docker Desktop 保持開著。</li>
+    <li>Windows：打開 ECP 教材包資料夾，連按兩下 <code>啟動ECP.cmd</code>。<br>
+      Mac：打開終端機，輸入 <code>cd </code>（後面有一個空白），把 ECP 教材包資料夾拖進終端機視窗，按 Enter，再輸入：
+      <div class="cp block"><code>bash ecp.sh start</code></div></li>
+    <li>第一次會載入映像檔、建立資料庫，大約 3～5 分鐘，視窗會一直跑文字，等它跑完。</li>
+    <li>完成後瀏覽器會自動打開 <span class="cp"><code>http://127.0.0.1:22821/aipower/</code></span>（沒有自動打開就自己貼上這個網址）。</li>
+    <li>登入名稱填 <code>administrator</code>，密碼在 ECP 教材包資料夾的 <code>初始密碼.txt</code>。看到 ECP 首頁就成功了。</li>
+  </ol>
+  <div class="warn"><p>密碼連錯約 3 次，ECP 會把帳號鎖 30 分鐘。登不進去時，先打開 <code>初始密碼.txt</code> 重新複製，不要一直試。</p></div>
+  <h2>平常使用</h2>
+  <table>
+    <tr><th>要做的事</th><th>Windows</th><th>Mac</th></tr>
+    <tr><td>啟動（先開 Docker Desktop）</td><td><code>啟動ECP.cmd</code></td><td><code>bash ecp.sh start</code></td></tr>
+    <tr><td>停止（資料會保留）</td><td><code>停止ECP.cmd</code></td><td><code>bash ecp.sh stop</code></td></tr>
+    <tr><td>重設成空白（資料全部刪除）</td><td><code>重設ECP.cmd</code>，輸入 <code>yes</code></td><td><code>bash ecp.sh reset</code>，輸入 <code>yes</code></td></tr>
+  </table>
+  <div class="note"><p>ECP 很吃記憶體，不上課時可以停止，資料會留著。停止或重開電腦都不會遺失資料，只有「重設」才會清空。</p></div>
+</section>
+
+<section data-step data-min="3" data-title="E. 確認">
+  <h1>E. 確認</h1>
+  <div class="meta"></div>
+  <p>上課前確認這三件事都正常：</p>
+  <table>
+    <tr><th>#</th><th>操作</th><th>應該看到</th></tr>
+    <tr><td>1</td><td>終端機輸入 <code>node --version</code></td><td><code>v22.9.0</code> 或更大</td></tr>
+    <tr><td>2</td><td>Claude 桌面 App → Code 分頁，打開學員起始包</td><td>AI 能回答你的問題</td></tr>
+    <tr><td>3</td><td>啟動 ECP，打開 <code>http://127.0.0.1:22821/aipower/</code></td><td>能用 <code>administrator</code> 登入</td></tr>
+  </table>
+  <p>都正常就可以開始 <a href="stage1.html">階段一：Sheet 版</a>。</p>
+</section>
+
+<section data-step data-min="0" data-title="常見問題">
+  <h1>常見問題</h1>
+  <div class="meta"></div>
+  <table>
+    <tr><th>看到</th><th>原因</th></tr>
+    <tr><td>終端機說找不到 <code>node</code></td><td>終端機在安裝前就開著。關掉重開；還不行就重新開機</td></tr>
+    <tr><td><code>node --version</code> 小於 22.9</td><td>電腦上原本有舊版。到 nodejs.org 重新安裝 LTS 版</td></tr>
+    <tr><td>啟動 ECP 時說找不到 Docker</td><td>Docker Desktop 沒開，或還沒啟動完成。等左下角顯示 Engine running 再執行</td></tr>
+    <tr><td>啟動失敗，訊息提到 <code>22821</code></td><td>這個連接埠被其他程式佔用（例如另一套 ECP 還開著）。先關掉那個程式</td></tr>
+    <tr><td>等了 10 分鐘還沒好</td><td>在 ECP 教材包資料夾打開終端機，執行 <code>docker compose logs ecp</code>，把最後幾行給講師看</td></tr>
+    <tr><td>Docker Desktop 說要開虛擬化（virtualization）</td><td>電腦的 BIOS 沒開虛擬化，請 IT 協助</td></tr>
+    <tr><td>ECP 教材包資料夾裡多了一個 <code>.env</code></td><td>第一次啟動時自動產生，是這台電腦專用的資料庫密碼。不要刪；刪了只能重設 ECP</td></tr>
+  </table>
+</section>
